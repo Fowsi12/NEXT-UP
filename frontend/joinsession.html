@@ -1,21 +1,19 @@
-!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="db/connect.js"></script>
+    <script src="endpoint-user.js"></script>
     <link rel="stylesheet" href="styles.css" />
     <title>Join Session</title>
-    <title> QR Scanner</title>
-    /*qrscanner*/
-    <script> src="indsæt url når det kommer"></script>
   </head>
   <body>
     <h1 style="color: white">Join Session</h1>
     <div id="joinSessionInput">
       <input 
       id="joinSession" 
-      type="numbers"
+      type="text"
       placeholder="Insert Session ID..."
       />
       <a href="mainpage.html">
@@ -26,23 +24,5 @@
       <h3 style="color: white">Scan QR kode</h3>
         <video id = "qr-video" width = "300" height="200"></video>
     </div>
-  <script>
-    function startScanner(){
-      const scanner = new Html5qrcode("qr-reader");
-      scanner.start(
-        {facuingMode:"enviroment"},//bagkamera
-        {fps:10,qrbox:250},
-        function(result){
-          alert("QR kode:"+result);//viser resultat
-          scanner.stop();
-        },
-        function(error){
-          //ignorere fejl
-        }
-      );
-    }
-    //starter automatisk
-    startScanner();
-    </script>
   </body>
 </html>

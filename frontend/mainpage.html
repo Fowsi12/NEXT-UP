@@ -1,9 +1,10 @@
-!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="db/connect.js"></script>
+    <script src="endpoint-user.js"></script>
     <link rel="stylesheet" href="styles.css" />
     <title>Mainpage</title>
   </head>
@@ -11,8 +12,10 @@
     <header>
       <h1>BinaryFlow</h1>
     </header>
+
+<!-- ALT I centerContent centreres og stables lodret-->
     <div id="centerContent">
-      <!-- MOOD MENU -->
+<!-- MOOD MENU -->
       <div class="moodMenu">
         <div>
           <button class="" onclick="showEnergetic()">
@@ -45,6 +48,27 @@
           </button>
         </div>      
       </div>
+<!-- MOOD POPUP BOXES-->
+      <div class="moodBox" id="energeticBox">
+        <h2>Energetic tracks</h2>
+      </div>
+      <div class="moodBox" id="chillBox">
+        <h2>Chill tracks</h2>
+      </div>
+      <div class="moodBox" id="partyBox">
+        <h2>Party tracks</h2>
+      </div>
+      <div class="moodBox" id="happyBox">
+        <h2>Happy tracks</h2>
+      </div>
+      <div class="moodBox" id="romanticBox">
+        <h2>Romantic tracks</h2>
+      </div>
+      <div class="moodBox" id="loungeBox">
+        <h2>Lounge tracks</h2>
+      </div>
+
     </div>
+
   </body>
 </html>
