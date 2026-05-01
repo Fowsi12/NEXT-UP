@@ -14,11 +14,6 @@ create table artists (
     nationality         char(2)         not null,
     unique (name, nationality)
 )
--- GENRES (er den nødvendig?) -- 
-create table genres (
-    genre_id            integer         unique not null,
-    title               text            not null,
-)
 -- MOODS -- 
 create table moods (
     mood_id             integer         unique not null,
@@ -39,6 +34,7 @@ create table tracks (
 )
 -- VOTES -- 
 create table votes (
+    vote_id             integer         unique not null,
     session_id          integer         not null references sessions (session_id),
     user_id             integer         not null references user (user_id),
     track_id            integer         not null references tracks (track_id)

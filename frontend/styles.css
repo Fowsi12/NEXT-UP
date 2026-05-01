@@ -1,8 +1,21 @@
 body {
-  background: linear-gradient(to right, #000000, #000000);
+  background: linear-gradient(to bottom, #000000, #522cc4);
   margin: 0;
-  padding: 20px;
+  min-height: 100vh; /*Tving body til at fylde hele skærmen*/
 }
 h1 {
   text-align: center;
+  color: white;
+}
+
+#centerContent {
+  display: flex;
+  flex-direction: column; /* Alt i centerContent stables lodret */
+  align-items: center; /* ALT I centercontent centreres */
+  position: relative; /* Parent til Popup boxes, don't touch!! */
+}
+/* MOOD MENU */
+.moodMenu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
