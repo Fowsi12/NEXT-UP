@@ -1,4 +1,5 @@
 /* OPEN MOOD BOXES */
+const moodBoxes = document.querySelectorAll(".moodBox");
 const openMoodBoxButtons = document.querySelectorAll(".openMoodBox");
 /* .querySelectorAll:
 finder alle elementer med class="closeMoodBox"
@@ -7,6 +8,15 @@ openMoodBoxButtons.forEach(function(button) {
 /* forEach: 
 følgende gøres for hvert element i NodeList'en*/
     button.addEventListener("click", function() {
+        
+        moodBoxes.forEach(function(box) {
+            box.style.display = "none";
+            box.style.opacity = "0";
+            box.style.pointerEvents = "none";
+        });
+/*moodBoxes.forEach:
+Lukker evt. åbne Moodboxes, hvis man klipper på en anden*/
+
         const targetBox = button.dataset.target;
 /* button.dataset.target:
 const targetBox oprettes fra attributten "data-target" fra html 
@@ -26,6 +36,7 @@ På denne måde kan vi ramme alle 6 med én funktion*/
         }, 200);
     });
 });
+
 
 /* CLOSE MOOD BOXES */
 const closeMoodBoxButtons = document.querySelectorAll(".closeMoodBox"); 
