@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="db/connect.js"></script>
-    <script src="endpoint-user.js"></script>
+    <script src="js/endpoint-user.js"></script>
+    <script src="js/ui.js" defer></script> <!--defer=script loades efter html-->
     <link rel="stylesheet" href="styles.css" />
     <title>Mainpage</title>
   </head>
@@ -18,54 +19,73 @@
 <!-- MOOD MENU -->
       <div class="moodMenu">
         <div>
-          <button class="" onclick="showEnergetic()">
+          <button class="openMoodBox" data-target="energeticBox">
+            <!--data-target=hvilken class der skal rammes via klik-->
             <p class="moodButtonText">Energetic</p>
           </button>
         </div>
         <div>
-          <button class="" onclick="showChill()">
+          <button class="openMoodBox" data-target="chillBox">
             <p class="moodButtonText">Chill</p>
           </button>
         </div>
         <div>
-          <button class="" onclick="showParty()">
+          <button class="openMoodBox" data-target="partyBox">
             <p class="moodButtonText">Party</p>
           </button>
         </div>
         <div>
-          <button class="" onclick="showHappy()">
+          <button class="openMoodBox" data-target="happyBox">
             <p class="moodButtonText">Happy</p>
           </button>
         </div>
         <div>
-          <button class="" onclick="showRomantic()">
+          <button class="openMoodBox" data-target="romanticBox">
             <p class="moodButtonText">Romantic</p>
           </button>
         </div>
         <div>
-          <button class="" onclick="showLounge()">
+          <button class="openMoodBox" data-target="loungeBox">
             <p class="moodButtonText">Lounge</p>
           </button>
         </div>      
       </div>
 <!-- MOOD POPUP BOXES-->
       <div class="moodBox" id="energeticBox">
-        <h2>Energetic tracks</h2>
+        <h2 class="moodTitle">Energetic tracks</h2>
+          <button class="closeMoodBox">
+            ✕
+          </button>
       </div>
       <div class="moodBox" id="chillBox">
-        <h2>Chill tracks</h2>
+        <h2 class="moodTitle">Chill tracks</h2>
+          <button class="closeMoodBox">
+            ✕
+          </button>
       </div>
       <div class="moodBox" id="partyBox">
-        <h2>Party tracks</h2>
+        <h2 class="moodTitle">Party tracks</h2>
+          <button class="closeMoodBox">
+            ✕
+          </button>
       </div>
       <div class="moodBox" id="happyBox">
-        <h2>Happy tracks</h2>
+        <h2 class="moodTitle">Happy tracks</h2>
+          <button class="closeMoodBox">
+            ✕
+          </button>
       </div>
       <div class="moodBox" id="romanticBox">
-        <h2>Romantic tracks</h2>
+        <h2 class="moodTitle">Romantic tracks</h2>
+          <button class="closeMoodBox">
+            ✕
+          </button>
       </div>
       <div class="moodBox" id="loungeBox">
-        <h2>Lounge tracks</h2>
+        <h2 class="moodTitle">Lounge tracks</h2>
+          <button class="closeMoodBox">
+            ✕
+          </button>
       </div>
 
     </div>
