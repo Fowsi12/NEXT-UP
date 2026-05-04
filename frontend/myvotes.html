@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MyVotes</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel= "stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="js/myvotes.js" defer></script>
+</head>
+  <body>
+    <h1 class="myVotesHeader">My Votes</h1>
+    <!-- MY VOTES WINDOW -->
+    <ul class="myVotesList">
+        <li class="myVotesColumn">
+            1. Pink + White - Frank Ocean
+            <button class="delete-btn" onclick="removeSong(this)">
+                <img src="images/trashcan.png">
+            </button>
+        </li>
+        <li class="myVotesColumn">
+             2. Better Together - Jack Johnson
+            <button class="delete-btn" onclick="removeSong(this)">
+                <img src="images/trashcan.png">
+            </button>
+        </li>
+        <li class="myVotesColumn">
+            3. Get You - Daniel Caesar
+            <button class="delete-btn" onclick="removeSong(this)">
+                <img src="images/trashcan.png">
+            </button>
+        </li>
+    </ul>
+    
+<!--knapper nederst-->
+<div class="bottom-buttons">
+<!--fortryd sidste knap-->
+<button class="undoOne" onClick="undoLastVote()">
+    <img src="images/undo_arrow.png">
+</button>
+<!--Slet alle votes knap-->
+<button class="undoAll" onClick="undoAllVote()">
+    <img src="images/cancel_all_votes.png">
+</button>
+<!--Bekræft votes knap-->
+<button class="confirm" onClick="confirmVotes()">
+    <img src="images/confirm.png">
+</button>
+</div>
+
+
+<!--MENU BAR-->
+<div class="menu">
+  <input type="checkbox" id="menu-toggle">
+<!-- checkbox er blevet lavet så det er muligt at holde dropdown nede, men checkboxen er også usynlig og ligger under/i button-->
+  <label for="menu-toggle" class="btn">
+    <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Menu
+  </label>
+<!-- Label gøre det muligt at trykke på dropdown elementerne og blive henvist til den rigtige side-->
+  <div class="menu-content">
+    <a href="mainpage.html"><i class="fa-brands fa-odysee"></i>&nbsp;&nbsp;&nbsp;Mood selection</a>
+    <a href="myvotes.html"><i class="fa-solid fa-list-ul"></i>&nbsp;&nbsp;&nbsp;My Votes</a>
+    <a href="index.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;&nbsp;&nbsp;Leave Session</a>
+  </div>
+</div>
+
+
+
+  </body>
+</html>
+
+

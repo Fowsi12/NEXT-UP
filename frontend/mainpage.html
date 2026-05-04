@@ -5,18 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="db/connect.js"></script>
     <script src="js/endpoint-user.js"></script>
-    <script src="js/ui.js" defer></script> <!--defer=script loades efter html-->
+    <script src="js/ui.js" defer></script> <!--defer=script's DOMContentLoad aktiveres efter html-->
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <title>Mainpage</title>
   </head>
   <body>
     <header>
-      <h1>BinaryFlow</h1>
+      <h1 class="binaryFlowHeader">BinaryFlow</h1>
     </header>
 
-<!-- ALT I centerContent centreres og stables lodret-->
+<!-- ALT I centerContent centreres og stables lodret -->
     <div id="centerContent">
-<!-- MOOD MENU -->
+
+      <!-- MOOD MENU -->
       <div class="moodMenu">
         <div>
           <button class="openMoodBox" data-target="energeticBox">
@@ -50,11 +54,15 @@
           </button>
         </div>      
       </div>
-<!-- MOOD POPUP BOXES-->
+
+      <!-- MOOD POPUP BOXES-->
       <div class="moodBox" id="energeticBox">
         <h2 class="moodTitle">Energetic tracks</h2>
           <button class="closeMoodBox">
             ✕
+          </button>
+          <button class="vote-btn">
+            <i class="fa-solid fa-plus"></i>
           </button>
       </div>
       <div class="moodBox" id="chillBox">
@@ -62,11 +70,17 @@
           <button class="closeMoodBox">
             ✕
           </button>
+          <button class="vote-btn">
+            <i class="fa-solid fa-plus"></i>
+          </button>
       </div>
       <div class="moodBox" id="partyBox">
         <h2 class="moodTitle">Party tracks</h2>
           <button class="closeMoodBox">
             ✕
+          </button>
+          <button class="vote-btn">
+            <i class="fa-solid fa-plus"></i>
           </button>
       </div>
       <div class="moodBox" id="happyBox">
@@ -74,11 +88,17 @@
           <button class="closeMoodBox">
             ✕
           </button>
+          <button class="vote-btn">
+            <i class="fa-solid fa-plus"></i>
+          </button>
       </div>
       <div class="moodBox" id="romanticBox">
         <h2 class="moodTitle">Romantic tracks</h2>
           <button class="closeMoodBox">
             ✕
+          </button>
+          <button class="vote-btn">
+            <i class="fa-solid fa-plus"></i>
           </button>
       </div>
       <div class="moodBox" id="loungeBox">
@@ -86,9 +106,27 @@
           <button class="closeMoodBox">
             ✕
           </button>
+          <button class="vote-btn">
+            <i class="fa-solid fa-plus"></i>
+          </button> 
       </div>
 
     </div>
 
+
+<!--MENU BAR-->
+<div class="menu">
+  <input type="checkbox" id="menu-toggle">
+
+  <label for="menu-toggle" class="btn">
+    <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Menu
+  </label>
+
+  <div class="menu-content">
+    <a href="mainpage.html"><i class="fa-brands fa-odysee"></i>&nbsp;&nbsp;&nbsp;Mood selection</a>
+    <a href="myvotes.html"><i class="fa-solid fa-list-ul"></i>&nbsp;&nbsp;&nbsp;My Votes</a>
+    <a href="index.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;&nbsp;&nbsp;Leave Session</a>
+  </div>
+</div>
   </body>
 </html>

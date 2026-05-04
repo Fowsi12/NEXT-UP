@@ -1,19 +1,19 @@
-body {
+ body {
   background: linear-gradient(to bottom, #000000, #522cc4);
   margin: 0;
   min-height: 100vh; /*Tving body til at fylde hele skærmen*/
 }
-h1 {
+.binaryFlowHeader {
   text-align: center;
   color: white;
 }
-
 #centerContent {
   display: flex;
   flex-direction: column; /* Alt i centerContent stables lodret */
   align-items: center; /* ALT I centercontent centreres */
   position: relative; /* Parent til Popup boxes, don't touch!! */
 }
+
 /* MOOD MENU */
 .moodMenu {
   display: grid;
@@ -41,6 +41,18 @@ h1 {
 .moodTitle {
   text-align: center;
 }
+/* VOTE BUTTON I MOOD POPUP BOXES */
+.vote-btn {
+    position: relative;
+    padding: 8px 10px;
+
+    background:#45c226;
+    color: white;
+    border: none;
+    border-radius: 100px;
+
+    cursor: pointer;
+}
 /* CLOSE BUTTON I MOOD BOXES*/
 .closeMoodBox {
   position: absolute;
@@ -48,5 +60,139 @@ h1 {
   right: 10px;
   width: 30px;
   height: 30px;
+  border-radius: 100px;
   z-index: 11;
+
+  cursor: pointer;
+}
+
+/* MENU KNAP ØVERST TIL VENSTRE */
+/* Placering af menuen */
+.menu {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: inline-block;
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+/* Skjuler checkboxen */
+#menu-toggle {
+  display: none;
+}
+/* Menu-knappen */
+.btn {
+  display: inline-block;
+  background-color: rgb(100, 2, 109);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  user-select: none;
+}
+/* Hover på selve menu-knappen */
+.btn:hover {
+  background-color: rgb(190, 5, 206);
+}
+/* Dropdown-menuen */
+.menu-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+
+  background-color: white;
+  min-width: 220px;
+
+  /* Vigtigt: undgå mellemrum, der lukker hover-menuen */
+  margin-top: 0;
+
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 10;
+}
+/* Links i dropdown */
+.menu-content a {
+  color: rgb(60, 0, 70);
+  padding: 14px 18px;
+  text-decoration: none;
+  display: block;
+  font-size: 15px;
+}
+/* Hover på menufelterne */
+.menu-content a:hover {
+  background-color: rgb(245, 220, 250);
+  color: rgb(100, 2, 109);
+}
+/* Dropdown vises når musen er over menuen */
+.menu:hover .menu-content {
+  display: block;
+}
+/* Dropdown vises også når man har klikket på menuen */
+#menu-toggle:checked ~ .menu-content {
+  display: block;
+}
+/* Knappen bliver lyselilla når menuen er klikket åben */
+#menu-toggle:checked + .btn {
+  background-color: rgb(190, 5, 206);
+}
+
+
+/* MY VOTES SIDEN */
+/* My Votes header */
+.myVotesHeader {
+  color:white;
+  text-align: center;
+}
+.myVotesList {
+  color: white; /* text hvid i listen */
+}
+/* Delete song button */
+.delete-btn {
+  background:#d50000;
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  justify-content: center;
+  display: flex;
+}
+.myVotesColumn {
+  background: rgba(255,255,255,0.1);
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 10px;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.bottom-buttons{
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap:20px;
+}
+.undoOne {
+  background: rgb(158, 158, 0);
+  color: black;
+  padding: 12px 20px;
+  border-radius: 100px;
+}
+.undoAll {
+  background: rgb(177, 0, 0);
+  color: black;
+  padding: 12px 20px;
+  border-radius: 100px;
+}
+.confirm {
+  background: rgb(0, 143, 0);
+  color: black;
+  padding: 12px 20px;
+  border-radius: 100px;
 }
