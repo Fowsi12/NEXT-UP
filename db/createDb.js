@@ -116,7 +116,6 @@ await upload (db, 'db/albums.csv', `
     with csv header encoding 'UTF-8'
 `);
 
-
 await upload(db, 'db/tracks.csv',`
     copy tracks (track_id, artist_id, album_id, title, milliseconds)
     from stdin
