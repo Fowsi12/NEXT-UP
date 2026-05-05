@@ -184,13 +184,13 @@
   padding: 12px 20px;
   border-radius: 100px;
 }
-.undoAll {
+.deleteAllVotes {
   background: rgb(177, 0, 0);
   color: black;
   padding: 12px 20px;
   border-radius: 100px;
 }
-.confirm {
+.confirmVotes {
   background: rgb(0, 143, 0);
   color: black;
   padding: 12px 20px;

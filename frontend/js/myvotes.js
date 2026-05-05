@@ -1,3 +1,6 @@
+/* DENNE SIDE ER TIL MY VOTES 
+DEN STYRER FUNKTIONERNE UNDO, DELETE ALL OG CONFIRM VOTES */
+
 /* TO DO: RYD OP PÅ DENNE SIDE FAY!!!!!!! */
 
 const myVotesList = document.getElementById("myVotes");

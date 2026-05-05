@@ -34,39 +34,38 @@
         </li>
     </ul>
     
-<!--knapper nederst-->
-<div class="bottom-buttons">
-<!--fortryd sidste knap-->
-<button class="undoOne" onClick="undoLastVote()">
-    <img src="images/undo_arrow.png">
-</button>
-<!--Slet alle votes knap-->
-<button class="undoAll" onClick="undoAllVote()">
-    <img src="images/cancel_all_votes.png">
-</button>
-<!--Bekræft votes knap-->
-<button class="confirm" onClick="confirmVotes()">
-    <img src="images/confirm.png">
-</button>
-</div>
+    <!--knapper nederst-->
+    <div class="bottom-buttons">
+      <!--fortryd sidste knap-->
+      <button class="undoOne" title="Undo" onClick="undoOne()">
+          <img src="images/undo_arrow.png">
+      </button>
+      <!--Slet alle votes knap-->
+      <button class="deleteAllVotes" title="Delete all votes" onClick="undoAllVote()">
+          <img src="images/cancel_all_votes.png">
+      </button>
+      <!--Bekræft votes knap-->
+      <button class="confirmVotes" title="Confirm votes (add songs to queue)" onClick="confirmVotes()">
+          <img src="images/confirm.png">
+      </button>
+    </div>
 
-
-<!--MENU BAR-->
-<div class="menu">
-  <input type="checkbox" id="menu-toggle">
-<!-- checkbox er blevet lavet så det er muligt at holde dropdown nede, men checkboxen er også usynlig og ligger under/i button-->
-  <label for="menu-toggle" class="btn">
-    <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Menu
-  </label>
-<!-- Label gøre det muligt at trykke på dropdown elementerne og blive henvist til den rigtige side-->
-  <div class="menu-content">
-    <a href="mainpage.html"><i class="fa-brands fa-odysee"></i>&nbsp;&nbsp;&nbsp;Mood selection</a>
-    <a href="myvotes.html"><i class="fa-solid fa-list-ul"></i>&nbsp;&nbsp;&nbsp;My Votes</a>
-    <a href="index.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;&nbsp;&nbsp;Leave Session</a>
-  </div>
-</div>
-
-
+    <!--MENU BAR-->
+    <div class="menu">
+      <input type="checkbox" id="menu-toggle">
+        <!-- checkbox er blevet lavet så det er muligt at holde dropdown nede, 
+        men checkboxen er også usynlig og ligger under/i button-->
+      <label for="menu-toggle" class="btn">
+        <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Menu
+      </label>
+        <!-- Label gøre det muligt at trykke på dropdown elementerne og blive 
+        henvist til den rigtige side-->
+      <div class="menu-content">
+        <a href="mainpage.html"><i class="fa-brands fa-odysee"></i>&nbsp;&nbsp;&nbsp;Mood selection</a>
+        <a href="myvotes.html"><i class="fa-solid fa-list-ul"></i>&nbsp;&nbsp;&nbsp;My Votes</a>
+        <a href="index.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;&nbsp;&nbsp;Leave Session</a>
+      </div>
+    </div>
 
   </body>
 </html>

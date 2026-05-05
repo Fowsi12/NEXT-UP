@@ -1,4 +1,4 @@
-track_id,artist_id,album_id,title,miliseconds
+track_id,artist_id,album_id,title,milliseconds
 1,2,1,Shape of You,233712
 2,39,12,Dance Monkey,209754
 3,4,3,bad guy,194087
