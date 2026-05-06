@@ -46,8 +46,8 @@ create table users (
 -- SESSIONS -- 
 create table sessions (
     session_id          integer         unique not null,
-    is_private          boolean         not null
-    created_at          timestamp,
+    is_private          boolean         not null,
+    created_at          timestamp       default current_timestamp
 )
 -- SESSIONS_TRACKS -- 
 create table sessions_tracks (

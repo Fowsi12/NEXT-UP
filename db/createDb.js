@@ -38,9 +38,12 @@ await db.query /*SESSIONS*/ (`
   create table sessions (
     session_id          integer         unique not null,
     is_private          boolean         not null,
-    created_at          timestamp
-  )
+    created_at          timestamp       default current_timestamp
+  ) 
 `);
+/* default current_timestamp: 
+hvis vi ikke selv angiver en værdi, 
+indsætter databasen automatisk tidspunktet til nu */
 await db.query /*USERS*/ (`
   create table users (
     user_id             integer         unique not null,

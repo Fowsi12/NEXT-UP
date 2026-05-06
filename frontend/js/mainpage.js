@@ -5,7 +5,7 @@ Det genererer en liste af moods, som mood-knapper oprettes efter.
 
 
 const response = await fetch('/api/moods')
-console.log(response);
+console.log(response.status);
 if (response.ok) {
     const moodsList = await response.json();
     console.log(moodsList);
