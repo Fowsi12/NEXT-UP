@@ -2,29 +2,36 @@
 let isMoodBoxOpen = null // variabel til at se, om MoodBox er åben eller lukket
 console.log("isMoodBoxOpen: " + isMoodBoxOpen)
 const moodBoxes = document.querySelectorAll(".moodBox");
-const openMoodBoxButtons = document.querySelectorAll(".openMoodBox");
+
 /* .querySelectorAll:
 finder alle elementer med class="closeMoodBox"
 og returnerer en NodeList (liste med elementer) */
-openMoodBoxButtons.forEach(function(button) {
+
 /* forEach: 
 følgende gøres for hvert element i NodeList'en*/
-    button.addEventListener("click", function() {
+    document.addEventListener("click", function(event) {
 /*moodBoxes.forEach:
 Lukker evt. åbne Moodboxes, hvis man klipper på en anden*/
+    const button = event.target.closest(".openMoodBox");
+    if(button){
         const targetBox = button.dataset.target;
 /* button.dataset.target:
 const targetBox oprettes fra attributten "data-target" fra html 
 I html har hver knap sit eget data-target, så de kan pege på forskellige classes*/
         const box = document.getElementById(targetBox);
-        box.style.display = "block";
-        isMoodBoxOpen = true
-        console.log("isMoodBoxOpen: " + isMoodBoxOpen)
+        if(box){
+            box.style.display = "block";
+            isMoodBoxOpen = true
+            console.log("isMoodBoxOpen: " + isMoodBoxOpen)
+        
         setTimeout(function () {
             box.style.opacity = "1";
             box.style.pointerEvents = "auto";
         }, 200);
-    });
+    } else{
+        console.log("Can't find moodBox",targetBox);
+    }
+    }
 });
 /* const box: 
 Det er den box, som vi vil ændre på (åbne).

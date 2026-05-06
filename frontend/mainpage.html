@@ -21,41 +21,10 @@
 <!-- ALT I centerContent centreres og stables lodret -->
     <div id="centerContent">
 
-      <!-- MOOD MENU -->
-      <div class="moodMenu">
-        <div>
-          <button class="openMoodBox" data-target="energeticBox">
-            <!--data-target=hvilken class der skal rammes via klik-->
-            <p class="moodButtonText">Energetic</p>
-          </button>
-        </div>
-        <div>
-          <button class="openMoodBox" data-target="chillBox">
-            <p class="moodButtonText">Chill</p>
-          </button>
-        </div>
-        <div>
-          <button class="openMoodBox" data-target="partyBox">
-            <p class="moodButtonText">Party</p>
-          </button>
-        </div>
-        <div>
-          <button class="openMoodBox" data-target="happyBox">
-            <p class="moodButtonText">Happy</p>
-          </button>
-        </div>
-        <div>
-          <button class="openMoodBox" data-target="romanticBox">
-            <p class="moodButtonText">Romantic</p>
-          </button>
-        </div>
-        <div>
-          <button class="openMoodBox" data-target="loungeBox">
-            <p class="moodButtonText">Lounge</p>
-          </button>
-        </div>      
-      </div>
+      
 
+      <!--AUTO MOOD MENU-->
+<div id="moodcontainer" class="moodMenu"></div> <!--tom div til moodboxes,hvor js tilføjer dem senere-->
       <!-- MOOD POPUP BOXES-->
       <div class="moodBox" id="energeticBox">
         <h2 class="moodTitle">Energetic tracks</h2>
@@ -109,11 +78,9 @@
           </button>
           <button class="vote-btn">
             <i class="fa-solid fa-plus"></i>
-          </button> 
+          </button>
       </div>
-
-    </div>
-
+</div>
 
 <!--MENU BAR-->
 <div class="menu">

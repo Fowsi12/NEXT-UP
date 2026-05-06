@@ -9,9 +9,33 @@ console.log(response.status);
 if (response.ok) {
     const moodsList = await response.json();
     console.log(moodsList);
+
+const moodContainer = document.getElementById("moodcontainer");
+moodContainer.innerHTML="";/*rydder containeren så der ikke bliver lavet dobbelt*/
+moodsList.forEach(function(mood) {
+    const div = document.createElement("div");/*laver en div rundt om knappen*/
+    const button = document.createElement("button"); /*laver selveste knappen*/
+    button.classList.add("openMoodBox");
+    button.dataset.target= mood.mood.toLowerCase()+"Box";/*laver data box med navnene på moods*/
+    const p = document.createElement("p");
+    p.classList.add("moodButtonText");
+    p.textContent=mood.mood;/*sætter tekst på knapperne*/
+    button.appendChild(p);/*sætter p tagget ind i knappen*/ 
+    button.addEventListener("click",function(){
+            console.log("You Chose! ",mood.mood); /*skriver det valgte mood ind i konsollen*/ 
+            console.log("Mood",mood.mood);
+            const target = button.dataset.target;
+            const moodBox = document.getElementById(target);
+            if(moodBox){
+                moodBox.classList.add("active");
+            } else{
+                console.log("Can't find moodBox",target);
+            }
+    });
+    div.appendChild(button);/*sæter knappen ind i div'en*/
+    moodContainer.appendChild(div);/* sætter div'en ind i moodcontainer*/
+});
 }
-
-
 /* MIKKELS MUSIKAPPLIKATION 
 artists.js: 
 
