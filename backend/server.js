@@ -6,19 +6,66 @@ const db = pool();
 const server = express();
 const port = 3009;
 
+
 server.use(express.static("frontend"));
+server.use(express.json()); // Gør det muligt for serveren at læse JSON-data fra frontend, fx session_id ved join.
 server.use(onEachRequest);
+
+server.post("/api/sessions/join", onJoinSession);
 server.post('/api/sessions/private', onCreatePrivateSession);
 server.post('/api/sessions/shared', onCreateSharedSession);
+server.get('/api/session/:session_id', )
 server.get('/api/moods', onGetStartMoods);
+
 server.listen(port, onServerReady);
+
+/* JOIN SESSION
+Tager session_id fra frontend, søger efter sessionen i databasen
+og sender enten sessionen tilbage eller en fejlbesked.
+*/
+
+async function onJoinSession(request, response) {
+  const sessionId = Number(request.body.session_id);
+
+  if (!sessionId) {
+    return response.status(400).json({
+      success: false,
+      message: "Session ID mangler eller er ugyldigt.",
+    });
+  }
+
+  const dbResult = await db.query(
+    `
+    select  session_id,
+            is_private,
+            created_at
+    from    sessions
+    where   session_id = $1
+    `,
+    [sessionId]
+  );
+
+  if (dbResult.rows.length === 0) {
+    return response.status(404).json({
+      success: false,
+      message: "Session blev ikke fundet.",
+    });
+  }
+
+  response.json({
+    success: true,
+    message: "Session fundet.",
+    session: dbResult.rows[0],
+  });
+}
 
 /* Opretter Private/Shared Session i databasen
 returning * = giv mig den række, du lige har oprettet. 
 Rækken leveres som en ordbog på index 0 i et array (derfor rows[0]). 
 Rækken/ordbogen er det eneste element i array'et her. 
 Uden returning * får man kun et tomt array tilbage.
-Ellers kunne man */
+Ellers kunne man køre en select lige efter insert, 
+men det holder ikke, hvis en anden bruger også opretter en session i mellem... */
 async function onCreatePrivateSession(request, response) {
   const dbResult = await db.query(`
     insert into sessions (is_private) values

@@ -3,21 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="db/connect.js"></script>
+
     <script src="js/endpoint-user.js"></script>
     <script src="js/ui.js"></script>
+    
     <link rel="stylesheet" href="styles.css" /> 
     <title>BinaryFlow</title>
   </head>
+  
   <body>
-    <header>
+    <header class="binaryFlowHeader">
       <h1>BinaryFlow</h1>
     </header>
+     
+      <!-- Start sender brugeren videre til siden hvor man vælger private/shared session -->
       <a href="createsession.html">
-        <button>Create session</button>
+        <button>Start</button>
       </a>
+      
+
+      <!-- Join sender brugeren videre til siden hvor man kan indtaste session_id -->
       <a href="joinsession.html">
-        <button>Join session</button>
+        <button>Join</button>
       </a>
+
   </body>
 </html>

@@ -36,11 +36,14 @@ await db.query /*MOODS*/(`
 `);
 await db.query /*SESSIONS*/ (`
   create table sessions (
-    session_id          integer         unique not null,
+    session_id          integer         generated always as identity unique not null,
     is_private          boolean         not null,
     created_at          timestamp       default current_timestamp
   ) 
 `);
+/* generated always as identity:
+databasen generer altid det næste tal i rækken
+*/
 /* default current_timestamp: 
 hvis vi ikke selv angiver en værdi, 
 indsætter databasen automatisk tidspunktet til nu */
@@ -80,6 +83,13 @@ await db.query /*SESSIONS_TRACKS*/ (`
     added_at            timestamp
   )
 `);
+await db.query(`
+    select setval(
+    pg_get_serial_sequence('sessions', 'session_id'),
+    (select max(session_id) from sessions),
+    true
+  );
+`); /* true betyder næste værdi bliver MAX + 1 */
 await db.query /*VOTES*/ (`
   create table votes (
     session_id          integer         not null references sessions (session_id),

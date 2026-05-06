@@ -3,20 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="db/connect.js"></script>
+    
     <script src="js/endpoint-user.js"></script>
+    <!-- JavaScript-filen sender request til backend og opretter sessionen -->
     <script src="js/createsession.js" defer type="module"></script>
     <script src="js/ui.js" defer></script>
+
     <link rel="stylesheet" href="styles.css" />
     <title> Create Session</title>
   </head>
+
   <body>
-    <h1 style="color: white">Binary Flow</h1>
-    <a href="mainpage.html"> 
-        <button class="createPrivate">Create private session</button>
-    </a>
-    <a href="mainpage.html">
-        <button class="createShared">Create shared session</button>
-    </a>
+    <h1 class="binaryFlowHeader" style="color: white">Binary Flow</h1>
+
+      <!-- Opretter en privat session via createsession.js -->
+      <button class="createPrivate">Create private session</button>
+      
+      <!-- Opretter en shared session via createsession.js -->
+      <button class="createShared">Create shared session</button>
+
+      <p id="createSessionMessage" style="color: white"></p>
   </body>
+
 </html>

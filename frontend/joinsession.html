@@ -3,23 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="db/connect.js"></script>
+    
+
     <script src="js/endpoint-user.js"></script>
+     <script src="js/joinsession.js" defer type="module"></script>
     <script src="js/ui.js"></script>
+
     <link rel="stylesheet" href="styles.css" />
     <title>Join Session</title>
   </head>
+
   <body>
     <h1 style="color: white">Join Session</h1>
+    
     <div id="joinSessionInput">
-      <input 
-      id="joinSession" 
-      type="text"
-      placeholder="Insert Session ID..."
+      <!-- Inputfelt hvor brugeren skriver det session_id, de vil joine -->
+      <input
+        id="joinSession"
+        type="text"
+        placeholder="Insert Session ID..."
       />
-      <a href="mainpage.html">
-        <button>Join session</button>
-      </a>
+
+      <!-- Knappen kalder joinsession.js, som tjekker session_id i backend -->
+      <button id="joinSessionButton">Join session</button>
+
+     
     </div>
   </body>
 </html>
