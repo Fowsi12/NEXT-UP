@@ -11,7 +11,32 @@
   display: flex;
   flex-direction: column; /* Alt i centerContent stables lodret */
   align-items: center; /* ALT I centercontent centreres */
+  text-align: center;
   position: relative; /* Parent til Popup boxes, don't touch!! */
+}
+/* ERROR MESSAGES:
+Til fejlbeskeder - vises centreret midt på siden og fader ud efter 5 sekunder
+id="errorBox 
+*/
+#errorBox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* centreres midt på siden */
+  z-index: 20;
+
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  background-color: crimson;
+  padding: 10px 20px;
+  border-radius: 8px;
+  
+  opacity: 0; /* starter synlig */
+  transition: opacity 0.5s ease;
+  display: none; /* skjult som default */
+  pointer-events: none; /* så den ikke blokerer klik */
 }
 
 /* MOOD MENU */

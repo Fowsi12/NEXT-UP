@@ -2,18 +2,17 @@
 let isMoodBoxOpen = null // variabel til at se, om MoodBox er åben eller lukket
 console.log("isMoodBoxOpen: " + isMoodBoxOpen)
 const moodBoxes = document.querySelectorAll(".moodBox");
-
 /* .querySelectorAll:
 finder alle elementer med class="closeMoodBox"
 og returnerer en NodeList (liste med elementer) */
 
 /* forEach: 
 følgende gøres for hvert element i NodeList'en*/
-    document.addEventListener("click", function(event) {
+document.addEventListener("click", function(event) {
 /*moodBoxes.forEach:
 Lukker evt. åbne Moodboxes, hvis man klipper på en anden*/
     const button = event.target.closest(".openMoodBox");
-    if(button){
+    if(button) {
         const targetBox = button.dataset.target;
 /* button.dataset.target:
 const targetBox oprettes fra attributten "data-target" fra html 
@@ -77,4 +76,3 @@ så man kan se knappen reagere*/
 venter 500 ms inden boxen bliver helt skjult igen, 
 fordi den har style="transition: opacity 0.5s"*/
 }
-

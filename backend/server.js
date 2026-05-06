@@ -72,7 +72,6 @@ async function onCreatePrivateSession(request, response) {
     (true)
     returning *
   `);
-
   response.status(201).json(dbResult.rows[0]);
 }
 async function onCreateSharedSession(request, response) {
@@ -81,7 +80,6 @@ async function onCreateSharedSession(request, response) {
     (false)
     returning *
   `);
-
   response.status(201).json(dbResult.rows[0]);
 }
 

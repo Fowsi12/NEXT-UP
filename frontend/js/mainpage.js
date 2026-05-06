@@ -1,41 +1,59 @@
 /* MAINPAGE
-Dette js henter data til mainpage.
+Dette js henter data til Mainpage.html
 Det genererer en liste af moods, som mood-knapper oprettes efter.
 */
+import { showError } from './ui_errorbox.js';
+const errorBox = document.getElementById("errorBox");
+/* errorBox:
+viser fejltekst i en popup box der forsvinder af sig selv */
 
-
+// TODO: pak nedenstående ind i en function der kaldes, når siden er loadet. 
+// der er ingen founktion defineret - den kører blot fetch og if osv ud af det blå.
+const moodContainer = document.getElementById("moodcontainer");
 const response = await fetch('/api/moods')
-console.log(response.status);
+console.log("Response: " + response.status);
+
 if (response.ok) {
     const moodsList = await response.json();
+    console.log("Loaded list of moods from database:")
     console.log(moodsList);
 
-const moodContainer = document.getElementById("moodcontainer");
-moodContainer.innerHTML="";/*rydder containeren så der ikke bliver lavet dobbelt*/
-moodsList.forEach(function(mood) {
-    const div = document.createElement("div");/*laver en div rundt om knappen*/
-    const button = document.createElement("button"); /*laver selveste knappen*/
-    button.classList.add("openMoodBox");
-    button.dataset.target= mood.mood.toLowerCase()+"Box";/*laver data box med navnene på moods*/
-    const p = document.createElement("p");
-    p.classList.add("moodButtonText");
-    p.textContent=mood.mood;/*sætter tekst på knapperne*/
-    button.appendChild(p);/*sætter p tagget ind i knappen*/ 
-    button.addEventListener("click",function(){
-            console.log("You Chose! ",mood.mood); /*skriver det valgte mood ind i konsollen*/ 
-            console.log("Mood",mood.mood);
+    moodContainer.innerHTML=""; 
+    /*moodContainer.innerHTML="";:
+    En failsafe, der rydder containeren. 
+    I tilfælde af at der allerede er indhold i den. 
+    Så undgår vi, at den opretter contet 2 gange */
+    
+    moodsList.forEach(function(mood) {
+        const div = document.createElement("div");/*laver en div rundt om knappen*/
+        const button = document.createElement("button"); /*laver selveste knappen*/
+        button.classList.add("openMoodBox");
+        button.dataset.target = mood.mood.toLowerCase()+"Box";/*laver data box med navnene på moods*/
+        const p = document.createElement("p");
+        p.classList.add("moodButtonText");
+        p.textContent=mood.mood;/*sætter tekst på knapperne*/
+        button.appendChild(p);/*sætter p tagget ind i knappen*/ 
+        button.addEventListener("click",function(){
+            console.log("You Chose: " + mood.mood + " mood!"); /*skriver det valgte mood ind i konsollen*/ 
             const target = button.dataset.target;
             const moodBox = document.getElementById(target);
-            if(moodBox){
+            if (moodBox) {
                 moodBox.classList.add("active");
-            } else{
+            } else {
                 console.log("Can't find moodBox",target);
+                showError("Cannot open the chosen mood menu")
             }
-    });
+        });
     div.appendChild(button);/*sæter knappen ind i div'en*/
     moodContainer.appendChild(div);/* sætter div'en ind i moodcontainer*/
-});
+    });
+} else {
+    console.log("error");
+    showError("It was not possible to load any moods from the database!");
 }
+
+
+
 /* MIKKELS MUSIKAPPLIKATION 
 artists.js: 
 

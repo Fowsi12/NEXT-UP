@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="db/connect.js"></script>
     <script src="js/endpoint-user.js"></script>
-    <script src="js/ui.js" defer></script> <!--defer=script's DOMContentLoad aktiveres efter html-->
+    <script src="js/ui_moodboxes.js" defer></script> <!--defer=script's DOMContentLoad aktiveres efter html-->
     <script src="js/mainpage.js" defer type="module"></script>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -18,13 +18,13 @@
       <h1 class="binaryFlowHeader">BinaryFlow</h1>
     </header>
 
-<!-- ALT I centerContent centreres og stables lodret -->
+      <!-- ALT I centerContent centreres og stables lodret -->
     <div id="centerContent">
-
-      
-
-      <!--AUTO MOOD MENU-->
-<div id="moodcontainer" class="moodMenu"></div> <!--tom div til moodboxes,hvor js tilføjer dem senere-->
+      <!--MOOD MENU-->
+      <!--tom div til moodbox de knapper, som JS opretter-->
+      <div id="moodcontainer" class="moodMenu">
+      </div> 
+      <p id="errorText"></p>
       <!-- MOOD POPUP BOXES-->
       <div class="moodBox" id="energeticBox">
         <h2 class="moodTitle">Energetic tracks</h2>
@@ -80,9 +80,9 @@
             <i class="fa-solid fa-plus"></i>
           </button>
       </div>
-</div>
+    </div>
 
-<!--MENU BAR-->
+      <!--MENU BAR-->
 <div class="menu">
   <input type="checkbox" id="menu-toggle">
 
@@ -96,5 +96,8 @@
     <a href="index.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;&nbsp;&nbsp;Leave Session</a>
   </div>
 </div>
+
+<!--Tom div til errorBox. Lad den ligge nederst-->
+<div id="errorBox"></div>
   </body>
 </html>

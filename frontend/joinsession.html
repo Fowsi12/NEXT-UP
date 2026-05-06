@@ -3,31 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-
     <script src="js/endpoint-user.js"></script>
-     <script src="js/joinsession.js" defer type="module"></script>
-    <script src="js/ui.js"></script>
-
+    <script src="js/joinsession.js" defer type="module"></script>
     <link rel="stylesheet" href="styles.css" />
     <title>Join Session</title>
   </head>
 
   <body>
-    <h1 style="color: white">Join Session</h1>
-    
-    <div id="joinSessionInput">
-      <!-- Inputfelt hvor brugeren skriver det session_id, de vil joine -->
-      <input
-        id="joinSession"
-        type="text"
-        placeholder="Insert Session ID..."
-      />
-
-      <!-- Knappen kalder joinsession.js, som tjekker session_id i backend -->
-      <button id="joinSessionButton">Join session</button>
-
-     
+    <header class="binaryFlowHeader">
+      <h1>BinaryFlow</h1>
+    </header>
+    <div id="centerContent">
+      <h2 style="color: white">Join Session</h2>
+      <div id="joinSessionInput">
+        <!-- Inputfelt hvor brugeren skriver det session_id, de vil joine -->
+        <input
+          id="joinSession"
+          type="text"
+          placeholder="Insert Session ID..."
+        />
+        <!-- Knappen kalder joinsession.js, som tjekker session_id i backend -->
+        <button id="joinSessionButton">Join session</button>
+      </div>
     </div>
   </body>
 </html>

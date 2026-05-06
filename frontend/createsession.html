@@ -7,22 +7,22 @@
     <script src="js/endpoint-user.js"></script>
     <!-- JavaScript-filen sender request til backend og opretter sessionen -->
     <script src="js/createsession.js" defer type="module"></script>
-    <script src="js/ui.js" defer></script>
 
     <link rel="stylesheet" href="styles.css" />
     <title> Create Session</title>
   </head>
 
   <body>
-    <h1 class="binaryFlowHeader" style="color: white">Binary Flow</h1>
-
+    <h1 class="binaryFlowHeader">Binary Flow</h1>
+    <div id="centerContent">
       <!-- Opretter en privat session via createsession.js -->
       <button class="createPrivate">Create private session</button>
       
       <!-- Opretter en shared session via createsession.js -->
       <button class="createShared">Create shared session</button>
+    </div>
 
-      <p id="createSessionMessage" style="color: white"></p>
+    <!--Tom div til errorBox. Lad den ligge nederst-->
+    <div id="errorBox"></div>
   </body>
-
 </html>

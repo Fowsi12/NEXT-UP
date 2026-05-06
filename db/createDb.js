@@ -83,13 +83,6 @@ await db.query /*SESSIONS_TRACKS*/ (`
     added_at            timestamp
   )
 `);
-await db.query(`
-    select setval(
-    pg_get_serial_sequence('sessions', 'session_id'),
-    (select max(session_id) from sessions),
-    true
-  );
-`); /* true betyder næste værdi bliver MAX + 1 */
 await db.query /*VOTES*/ (`
   create table votes (
     session_id          integer         not null references sessions (session_id),
@@ -153,6 +146,20 @@ await upload(db, 'db/votes.csv', `
     with csv header encoding 'UTF-8'
 `);
 
+await db.query /*SESSION_ID VALUE SEQUENCE FIX*/ (` 
+    select setval(
+    pg_get_serial_sequence('sessions', 'session_id'),
+    (select max(session_id) from sessions),
+    true
+  );
+`); 
+/* Når vi importerer data med faste id'er skal vi manuelt synkronisere vha. "setval". 
+Ellers vil de nye auto-genererede values konflikte som dubletter, 
+fordi ingen har fortalt databasen, at den ikke skal starte fra 1. 
+Dette fix sørger for, at næste value i session_id bliver "max value + 1".
+true betyder næste værdi bliver MAX + 1. Ellers kunne man skrive "+ 1, false".
+Det er vigtigt denne køres EFTER tabeller er oprettet, og csv er importeret 
+Vi kunne også have valgt undlade values i sessions.csv*/
 
 await db.end();
 console.log("Database successfully recreated.");
