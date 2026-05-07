@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="db/connect.js"></script>
     <script src="js/endpoint-user.js"></script>
-    <script src="js/ui_moodboxes.js" defer></script> <!--defer=script's DOMContentLoad aktiveres efter html-->
     <script src="js/mainpage.js" defer type="module"></script>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -26,8 +25,9 @@
       </div> 
       <p id="errorText"></p>
       <!-- MOOD POPUP BOXES-->
-      <div class="moodBox" id="energeticBox">
+      <div class="moodBox" id="energetic">
         <h2 class="moodTitle">Energetic tracks</h2>
+          <button class="refreshSongs">↻</button>
           <button class="closeMoodBox">
             ✕
           </button>
@@ -35,8 +35,10 @@
             <i class="fa-solid fa-plus"></i>
           </button>
       </div>
-      <div class="moodBox" id="chillBox">
+
+      <div class="moodBox" id="chill">
         <h2 class="moodTitle">Chill tracks</h2>
+          <button class="refreshSongs">↻</button>
           <button class="closeMoodBox">
             ✕
           </button>
@@ -44,8 +46,10 @@
             <i class="fa-solid fa-plus"></i>
           </button>
       </div>
-      <div class="moodBox" id="partyBox">
+
+      <div class="moodBox" id="party">
         <h2 class="moodTitle">Party tracks</h2>
+          <button class="refreshSongs">↻</button>
           <button class="closeMoodBox">
             ✕
           </button>
@@ -53,8 +57,10 @@
             <i class="fa-solid fa-plus"></i>
           </button>
       </div>
-      <div class="moodBox" id="happyBox">
+
+      <div class="moodBox" id="happy">
         <h2 class="moodTitle">Happy tracks</h2>
+          <button class="refreshSongs">↻</button>
           <button class="closeMoodBox">
             ✕
           </button>
@@ -62,8 +68,10 @@
             <i class="fa-solid fa-plus"></i>
           </button>
       </div>
-      <div class="moodBox" id="romanticBox">
+
+      <div class="moodBox" id="romantic">
         <h2 class="moodTitle">Romantic tracks</h2>
+          <button class="refreshSongs">↻</button>
           <button class="closeMoodBox">
             ✕
           </button>
@@ -71,8 +79,10 @@
             <i class="fa-solid fa-plus"></i>
           </button>
       </div>
-      <div class="moodBox" id="loungeBox">
+      
+      <div class="moodBox" id="lounge">
         <h2 class="moodTitle">Lounge tracks</h2>
+          <button class="refreshSongs">↻</button>
           <button class="closeMoodBox">
             ✕
           </button>

@@ -3,10 +3,13 @@ Denne fil styrer join-session siden.
 Den læser session_id fra inputfeltet, sender det til backend,
 og sender brugeren videre til mainpage.html hvis sessionen findes.
 */
+import { showError } from './ui_errorbox.js';
+const errorBox = document.getElementById("errorBox");
+/* errorBox:
+viser fejltekst i en popup box der forsvinder af sig selv */
 
 const joinButton = document.getElementById("joinSessionButton");
 const sessionInput = document.getElementById("joinSession");
-const message = document.getElementById("joinSessionMessage");
 
 joinButton.addEventListener("click", joinSession);
 
@@ -14,7 +17,7 @@ async function joinSession() {
   const sessionId = sessionInput.value.trim();
 
   if (!sessionId) {
-    message.textContent = "Skriv et session ID.";
+    showError("Skriv et session ID.");
     return;
   }
 
@@ -31,7 +34,7 @@ async function joinSession() {
     const result = await response.json();
 
     if (!response.ok) {
-      message.textContent = result.message || "Kunne ikke joine session.";
+      showError("Kunne ikke joine session.");
       return;
     }
 
@@ -49,9 +52,11 @@ Det bruges ofte til at huske brugerpræferencer (som "dark mode"), indkøbskurve
     console.log("Joined session:", result.session);
 
 // Hvis join lykkes, sendes brugeren videre til hovedsiden "mainpage.html".
-    window.location.href = "mainpage.html";
+    window.location.href = `mainpage.html?session_id=${result.session.session_id}`;
   } catch (error) {
     console.error(error);
     message.textContent = "Der skete en fejl ved join session.";
   }
 }
+
+

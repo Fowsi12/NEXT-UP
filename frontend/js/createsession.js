@@ -1,3 +1,4 @@
+/* JS til */
 import { showError } from './ui_errorbox.js';
 const errorBox = document.getElementById("errorBox");
 /* errorBox:
@@ -33,29 +34,31 @@ Denne ordbog gemmes i variablen const currentSession.
 Vi skal redirect klienten via det.
 Funktionerne laver derfor et link path med session_id ved at slå op i ordbogen, */
 async function createSession(endpoint) {
-    try {
-        const response = await fetch(endpoint, {
-            method: "POST",
-        });
-        if (!response.ok) {
-            console.log("error")
-            showError("Error: Cannot create new session");
-            return;
-        }
-        const currentSession = await response.json();
+  const response = await fetch(endpoint, {
+    method: "POST",
+  });
+
+  if (response.ok) {
+    const currentSession = await response.json();
+    
+        console.log("Session oprettet:", currentSession);
+        
         localStorage.setItem("session_id", currentSession.session_id);
         localStorage.setItem("is_private", currentSession.is_private);
+
 /* localStorage.setItem:
 Gemmer session_id i browseren, så andre sider kan vide hvilken session brugeren er i.
 localStorage er et JavaScript Web API, der gør det muligt at gemme data lokalt i brugerens browser. 
 Data bevares, selv efter browseren lukkes eller genstartes, og gemmes uden udløbsdato. 
 Det bruges ofte til at huske brugerpræferencer (som fx "dark mode"), indkøbskurve el.lign.*/
-        console.log("Response: " + response.status + "!"+ " Session created with Session Id: " + currentSession.session_id)
-/* Hvis join lykkes, skal bruger linkes videre til sin unikke udgave af "mainpage.html".
-window.location.href = `/session/${currentSession.session_id}`; */
-  
-    } catch (error) {
-    console.error(error);
-    showError("An error occured during the creation of session");
-    }
+
+/* window.location.href:
+Hvis join lykkes, skal bruger linkes videre til sin unikke udgave af "mainpage.html".
+window.location.href = `mainpage.html?session_id=${currentSession.session_id}`; 
+Sender brugeren videre til mainpage.html med session_id i URL'en
+*/
+    window.location.href = `mainpage.html?session_id=${currentSession.session_id}`;
+    } else {
+    showError("An error occured while creating a session");
+  }
 }

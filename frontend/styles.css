@@ -45,7 +45,6 @@ id="errorBox
   display: grid;
   grid-template-columns: repeat(2,1fr);
   gap: 12px;
-
 }
 /* MOOD POPUP BOXES */
 .moodBox {

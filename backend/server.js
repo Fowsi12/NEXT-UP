@@ -11,11 +11,12 @@ server.use(express.static("frontend"));
 server.use(express.json()); // Gør det muligt for serveren at læse JSON-data fra frontend, fx session_id ved join.
 server.use(onEachRequest);
 
-server.post("/api/sessions/join", onJoinSession);
+server.post('/api/sessions/join', onJoinSession);
 server.post('/api/sessions/private', onCreatePrivateSession);
 server.post('/api/sessions/shared', onCreateSharedSession);
-server.get('/api/session/:session_id', )
-server.get('/api/moods', onGetStartMoods);
+
+server.get('/api/moods', onGetStartMoods); /* henter moods til mainpage */
+server.get('/api/moods/tracks', onGetMoodTracks)/* henter sange til moods */
 
 server.listen(port, onServerReady);
 
@@ -97,6 +98,26 @@ async function onGetStartMoods(request,response){
     `); 
   response.json(dbResult.rows);
 }
+/* Henter alle tracks til hver mood:
+Funktion til at hente alle tracks til hver mood fra db.
+fletter moods og tracks sammen vha. join fra mood_id og track_id.
+*/
+async function onGetMoodTracks(request, response) {
+  const dbResult = await db.query(`
+    select  moods.mood_id,
+            moods.title as mood,
+            tracks.track_id,
+            tracks.title as track_title
+    from    tracks_moods
+    join    moods on tracks_moods.mood_id = moods.mood_id
+    join    tracks on tracks_moods.track_id = tracks.track_id
+  `);
+  response.json(dbResult.rows);
+}
+
+
+
+
 
 
 function onServerReady() {
