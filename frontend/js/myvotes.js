@@ -13,6 +13,12 @@ Hvis session_id er 12, gemmes sangene under:
 votes_session_12
 */
 
+/* ERROR BOX: 
+viser fejltekst i en popup box der forsvinder af sig selv
+Kald blot funktionen showError("") og boksen vises med tekst i*/
+import { showError } from './ui_errorbox.js';
+const errorBox = document.getElementById("errorBox");
+
 /* 
 Herunder er <ul class="myVotesList"></ul> i myvotes.html.
 Det er inde i denne liste, at vi senere indsætter sangene med JavaScript. 
@@ -126,7 +132,7 @@ function renderVotes() {
     const emptyMessage = document.createElement("li");
     emptyMessage.className = "myVotesColumn";
     emptyMessage.textContent = "Du har ikke valgt nogen sange endnu.";
-
+    showError("Du har ikke valgt nogen sange endnu.");
     myVotesList.appendChild(emptyMessage);
     return;
   }
@@ -349,6 +355,60 @@ window.removeSong = removeSong;
 window.undoLastVote = undoLastVote;
 window.deleteAllVotes = deleteAllVotes;
 window.confirmVotes = confirmVotes;
+
+
+/* INVITE FRIEND
+Denne del styrer Invite friend-knappen på myvotes.html.
+Knappen viser den session_id, som en ven skal bruge på Join-siden.
+*/
+
+/*
+Når brugeren klikker på knappen:
+1. Finder vi session_id fra localStorage
+2. Viser session_id i popup'en
+3. Vennen kan bruge dette id på Join-siden
+*/
+
+/* Finder Invite friend-knappen fra HTML */
+const inviteFriendButton = document.getElementById("inviteFriendButton");
+
+/* Finder selve popup-boksen fra HTML */
+const inviteFriendPopup = document.getElementById("inviteFriendPopup");
+
+/* Finder det felt i popup'en, hvor session_id skal vises */
+const inviteSessionId = document.getElementById("inviteSessionId");
+
+/* Finder luk-knappen i popup'en */
+const closeInvitePopup = document.getElementById("closeInvitePopup");
+
+/* Når brugeren klikker på Invite friend-knappen, åbnes popup'en */
+inviteFriendButton.addEventListener("click", showInviteFriendPopup);
+
+/* Når brugeren klikker på krydset, lukkes popup'en */
+closeInvitePopup.addEventListener("click", hideInviteFriendPopup);
+
+/* Viser popup'en med den aktuelle session_id */
+function showInviteFriendPopup() {
+  const sessionId = getCurrentSessionId();
+
+  /* Hvis der ikke findes en session_id, betyder det at brugeren ikke er i en session */
+  if (!sessionId) {
+    alert("Du er ikke i en session endnu.");
+    return;
+  }
+
+  /* Viser session_id inde i popup'en */
+  inviteSessionId.textContent = sessionId;
+
+  /* Gør popup'en synlig */
+  inviteFriendPopup.style.display = "block";
+}
+
+/* Skjuler popup'en igen */
+function hideInviteFriendPopup() {
+  inviteFriendPopup.style.display = "none";
+}
+
 
 /* 
 Når myvotes.html åbnes, kører renderVotes() med det samme.

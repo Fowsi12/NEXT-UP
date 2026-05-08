@@ -65,3 +65,7 @@ function removeTrackFromSessionVotes(trackId) {
 
   saveSessionVotes(votes);
 }
+
+
+// INVITE FRIENDS TO SESSION
+

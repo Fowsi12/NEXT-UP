@@ -7,53 +7,143 @@ Hvis brugeren klikker på krydset i en box, lukker den boxen.
 Hvis brugeren ikke synes om de 5 sange kan brugeren klikke på reset-knappen, og så hentes 5 nye sange til den mood.
 */
 
+
+
+
+/* ERROR BOX: 
+viser fejltekst i en popup box der forsvinder af sig selv
+Kald blot funktionen showError("") og boksen vises med tekst i*/
 import { showError } from './ui_errorbox.js';
 const errorBox = document.getElementById("errorBox");
-/* errorBox:
-viser fejltekst i en popup box der forsvinder af sig selv */
-const moodContainer = document.getElementById("moodcontainer");
+
+const moodContainer = document.getElementById("moodcontainer"); //container til mood knapper
+let isMoodBoxOpen = null // variabel til at se, om MoodBox er åben eller lukket
+let allTracks = []; /* Laver et array til alle tracks */
+
+
+
+
+
+/* HENT ALLE TRACKS & MOODS FRA DB */
+document.addEventListener("DOMContentLoaded", loadTracks);
+async function loadTracks() {
+    const response = await fetch('/api/moods/tracks');/*henter tracks fra backend api*/    
+    console.log("Response:" + response.status);
+    if (response.ok) {
+        allTracks = await response.json();
+        console.log("Loaded list of tracks from database:");
+        console.log(allTracks);
+    } else {
+        console.log("error");
+        showError("It was not possible to load any tracks from the database!");
+    }
+}
+
+
+
+
+
+/* MOOD BUTTONS GENERATOR */
+let moodsList = [];
+document.addEventListener("DOMContentLoaded", loadMoods);
+async function loadMoods() {
+    const response = await fetch('/api/moods')  /* response = ordbog med moods */
+    console.log("Response: " + response.status);
+    
+    if (response.ok) {
+        const moodsList = await response.json(); /* laver response til const MoodList */
+        console.log("Loaded list of moods from database:")
+        console.log(moodsList);
+
+        moodContainer.innerHTML=""; 
+            /*moodContainer.innerHTML="";:
+    En failsafe, der rydder containeren. 
+    I tilfælde af at der allerede er indhold i den. 
+    Så undgår vi, at den opretter contet 2 gange */
+    
+        moodsList.forEach(function(mood) {
+            const div = document.createElement("div");/*laver en div rundt om knappen*/
+            const button = document.createElement("button"); /*laver selveste knappen*/
+            button.classList.add("openMoodBox"); /* button får class="openMoodBox"*/
+            button.dataset.target = mood.mood.toLowerCase();/*laver data box med navnene på moods*/
+            const p = document.createElement("p");
+            p.classList.add("moodButtonText");
+            p.textContent=mood.mood;/*sætter tekst på knapperne*/
+            button.appendChild(p);/*sætter p tagget ind i knappen*/ 
+            button.addEventListener("click",function(){
+            console.log("You Chose: " + mood.mood + " mood!"); /*skriver det valgte mood ind i konsollen*/ 
+            const target = button.dataset.target;
+            const moodBox = document.getElementById(target);
+                if (moodBox) {
+                    moodBox.classList.add("active");
+                } else {
+                    console.log("Can't find moodBox",target);
+                    showError("Cannot open the chosen mood menu")
+                }
+            });
+        div.appendChild(button);/*sætter knappen ind i div'en*/
+        moodContainer.appendChild(div);/* sætter div'en ind i moodcontainer*/
+        });  
+    } else {
+        console.log("error");
+        showError("It was not possible to load any moods from the database!");
+    }
+}
+
+
+
+
+
 
 /* OPEN MOOD BOXES */
-let isMoodBoxOpen = null // variabel til at se, om MoodBox er åben eller lukket
 console.log("isMoodBoxOpen: " + isMoodBoxOpen)
 const moodBoxes = document.querySelectorAll(".moodBox");
 /* .querySelectorAll:
 finder alle elementer med class="closeMoodBox"
-og returnerer en NodeList (liste med elementer) */
+og returnerer en NodeList (liste med elementer)*/
 
 /* forEach: 
 følgende gøres for hvert element i NodeList'en*/
 document.addEventListener("click", function(event) {
 /*moodBoxes.forEach:
 Lukker evt. åbne Moodboxes, hvis man klipper på en anden*/
-    const button = event.target.closest(".openMoodBox");
+    const button = event.target.closest(".openMoodBox"); /* button rammer det element, der er tættest på med sit click event */
     if (button) {
         const targetBox = button.dataset.target;
-        getTracksForMood(targetBox);
 /* button.dataset.target:
 const targetBox oprettes fra attributten "data-target" fra html 
 I html har hver knap sit eget data-target, så de kan pege på forskellige classes*/
         const box = document.getElementById(targetBox);
+        const tracksForMood = getTracksForMood(allTracks, targetBox);
+        const fiveTracks = getFiveTracks(tracksForMood);
+        console.log("box: ");
+        console.log(box);
         if (box) {
             box.style.display = "block";
             isMoodBoxOpen = true
             console.log("isMoodBoxOpen: " + isMoodBoxOpen)
-        
         setTimeout(function () {
             box.style.opacity = "1";
             box.style.pointerEvents = "auto";
         }, 200);
-    } else {
-        console.log("Can't find moodBox",targetBox);
-    }
+        } else {
+            console.log("Can't find moodBox",targetBox);
+        }
     }
 });
 /* const box: 
+DOM Element, fx <div id="chill" class="moodBox">
 Det er den box, som vi vil ændre på (åbne).
 Den rammer vi vha. getElementById(targetBox). 
 I stedet for (targetBox), kunne vi have skrevet en class på en box, 
 men vi har 6 boxe, som skal åbnes med hver deres knap... 
 På denne måde kan vi ramme alle 6 med én funktion*/
+
+
+
+
+
+
 
 /* CLOSE MOOD BOXES */
 const closeMoodBoxButtons = document.querySelectorAll(".closeMoodBox"); 
@@ -93,157 +183,213 @@ venter 500 ms inden boxen bliver helt skjult igen,
 fordi den har style="transition: opacity 0.5s"*/
 }
 
-
-/* MOOD BUTTONS GENERATOR */
-let moodsList = [];
-document.addEventListener("DOMContentLoaded", loadMoods);
-async function loadMoods() {
-    const response = await fetch('/api/moods') /* response = ordbog med moods */
-    console.log("Response: " + response.status);
-    
-    if (response.ok) {
-        const moodsList = await response.json(); /* laver response til const MoodList */
-        console.log("Loaded list of moods from database:")
-        console.log(moodsList);
-
-        moodContainer.innerHTML=""; 
-            /*moodContainer.innerHTML="";:
-    En failsafe, der rydder containeren. 
-    I tilfælde af at der allerede er indhold i den. 
-    Så undgår vi, at den opretter contet 2 gange */
-    
-        moodsList.forEach(function(mood) {
-            const div = document.createElement("div");/*laver en div rundt om knappen*/
-            const button = document.createElement("button"); /*laver selveste knappen*/
-            button.classList.add("openMoodBox");
-            button.dataset.target = mood.mood.toLowerCase();/*laver data box med navnene på moods*/
-            const p = document.createElement("p");
-            p.classList.add("moodButtonText");
-            p.textContent=mood.mood;/*sætter tekst på knapperne*/
-            button.appendChild(p);/*sætter p tagget ind i knappen*/ 
-            button.addEventListener("click",function(){
-            console.log("You Chose: " + mood.mood + " mood!"); /*skriver det valgte mood ind i konsollen*/ 
-            const target = button.dataset.target;
-            const moodBox = document.getElementById(target);
-                if (moodBox) {
-                    moodBox.classList.add("active");
-                } else {
-                    console.log("Can't find moodBox",target);
-                    showError("Cannot open the chosen mood menu")
-                }
-            });
-        div.appendChild(button);/*sætter knappen ind i div'en*/
-        moodContainer.appendChild(div);/* sætter div'en ind i moodcontainer*/
-        });  
-    } else {
-        console.log("error");
-        showError("It was not possible to load any moods from the database!");
-    }
-}
-
-
-
-
-
-
-
-        /* HENT 5 SANGE TIL HVER MOOD */
-let allTracks = []; /* Laver et array til alle tracks */
-document.addEventListener("DOMContentLoaded", loadTracksMoods);
-async function loadTracksMoods() {
-    const response = await fetch('/api/moods/tracks')/*henter tracks fra backend api*/    
-    console.log("Response: " + response.status);
-    if (response.ok) {
-        allTracks = await response.json();
-        console.log("Loaded list of tracks from database:")
-        console.log(allTracks);
-        let fiveSongs = getTracksForMood("")
-        console.log("chill tjek")
-    } else {
-        console.log("error");
-        showError("It was not possible to load any tracks from the database!");
-    }
-}
-/* Funktion til at filtrerer tracks: 
+/* Funktion til at filtrerer allTracks efter mood: 
 Funktionen returner via et opslag på mood i den track parameter vi giver den
-Og hvis mood === mood, tages track med i resultatet*/
-function getTracksForMood(mood) {
-    const moodTracks = allTracks.filter(function(track) {
-        return track.mood.toLowerCase() === mood.toLowerCase(); 
+Og hvis mood === mood, tages track med i resultatet
+Vi skal bruge toLowerCase(), da vores moods står med stort forbogstav (fx Chill) 
+i csv/databasen */
+function getTracksForMood(allTracks, mood) {
+    const tracksForMood = [];
+    const n = allTracks.length;
+    let i = 0;
+    while (i < n) {
+        if (allTracks[i].mood.toLowerCase() === mood.toLowerCase()) {
+            tracksForMood.push(allTracks[i]);
+        }
+        i++;
+    }
+    console.log("Generated tracks for selected mood (" + mood + ")");
+    console.log(tracksForMood);
+    return tracksForMood;
+}
+
+/* Funktion til at blande sange og returnere 5 */
+function getFiveTracks(tracksForMood) {
+    const mixedTracks = tracksForMood.sort(function(){
+        return Math.random() - 0.5; 
+        /* .sort: 
+        vi sorterer i arrayet med Math.random (dvs. blander indexes tilfældigt) 
+        laver et tilfældigt tal mellem 0 og 1, og bruges til at blande listen */
     });
-   
-
-/*vi blander sangene tilfældigt*/ 
-let mixedTracks = moodTracks.sort(function() { /*.sort bruger resultatet til at vælge rækkefølgen*/
-    return Math.random() - 0.5; /* laver et tilfældigt tal mellem 0 og 1, og bruges til at blande listen*/
-});
-/*her tager vi de første 5 sange fra den blandede liste */
-let fiveTracks = mixedTracks.slice(0, 5);
-
-    return fiveTracks;
+    console.log("Mixed 5 tracks for selected mood: ")
+    console.log(mixedTracks.slice(0, 5));
+    return mixedTracks.slice(0, 5);
+    /* mixedTracks.slice:
+    tager index 0 til 4 af de blandede indexes og returneres */
 }
 
 
 
+/*GENERERE SANGELISTE TIL MOODBOXES*/
+function renderTracks(fiveTracks, box) {
+    const trackList = box.querySelector(".trackList");
+    trackList.innerHTML=""; /*rydder gamle sange fra pop-up vinduet*/
+    
+    /*hvis der ikke er hentet nogen sange fra db*/
+    if (fiveTracks.length === 0) {
+        showError("No tracks rendered for this mood");
+        return;
+    } else {
+        tracks.forEach(function(track) {
+            /* opretter én række pr. sang */
+            const trackRow = document.createElement("div");
+            trackRow.classList.add("trackRow");
+            
+            /* opretter en text container*/
+            const trackText = document.createElement("p");
+            trackText.classList.add("trackText");
+
+//TODO: træk artist_name med fra DB//
+            /* indsætter indhold i text container */
+            trackText.textContent = `${track.track_title} - ${track.artist_name}`;
+            
+            /* opretter vote knap m. class="vote-btn"*/
+            const voteButton = document.createElement("button")
+            voteButton.className="vote-btn";
+            voteButton.textContent= "+";
+            
+
+            voteButton.addEventListener("click", function () {
+            addSongToVotes(track);
+
+            voteButton.textContent = "Added";
+            voteButton.disabled = true;
+});
+        })
+    }
+    
+    /*laver en række for hver sang*/
+    for (const track of fiveTracks) {
+        const trackRow = document.createElement("div")
+        trackRow.className = "trackRow";
+    
+        const trackText = document.createElement("p");
+        trackText.textContent= `${track.track_title}-${track.artist_name}`; /*laver text til sangen*/ 
+        
+        const voteButton = document.createElement("button")
+        voteButton.className="vote-btn";
+        voteButton.textContent= "+";
+
+        trackRow.appendChild(trackText);
+        trackRow.appendChild(voteButton);
+
+        trackList.appendChild(trackRow);  
+
+    }
+}
+
+
+
+
+
+
+
+
+
+/* ADD SONG TO VOTES
+Denne funktion gemmer en valgt sang i localStorage.
+
+Sangen gemmes sammen med den aktuelle session_id.
+Det betyder, at hver session har sin egen liste af valgte sange.
+
+Eksempel:
+Hvis session_id = 28,
+så gemmes sangene under key'en:
+votes_session_28
+*/
 /*
-ADD/TILFØJ SANGE TIL MYVOTES.HTML NÅR I ER FÆRDIGE MED AT HENTE SANGE TIL MOODBOXENE
+Formålet er:
+1. At finde den session brugeren er i
+2. At finde de votes/sange, der allerede er gemt for den session
+3. At tjekke om sangen allerede er valgt
+4. At gemme sangen i localStorage
+5. Så myvotes.html senere kan hente og vise sangen
+*/
 function addSongToVotes(song) {
+  /* Henter session_id fra localStorage.
+
+  session_id bliver gemt, når brugeren enten:
+  - opretter en session i createsession.js
+  - joiner en session i joinsession.js
+
+  Eksempel:
+  sessionId = "28"
+  */
   const sessionId = localStorage.getItem("session_id");
+
+  /* Hvis der ikke findes en session_id, betyder det at brugeren
+  ikke er i en session endnu.
+
+  Derfor stopper vi funktionen med return,
+  så sangen ikke bliver gemt forkert.
+  */
+  if (!sessionId) {
+    showError("You are not in a session.");
+    return;
+  }
+
+  /* Her laver vi navnet på den localStorage-key,
+  som sangene skal gemmes under.
+
+  Vi bruger session_id i navnet, så hver session har sin egen liste.
+
+  Eksempel:
+  Hvis session_id = 28
+  bliver votesKey = "votes_session_28"
+  */
   const votesKey = `votes_session_${sessionId}`;
 
+  /* Henter de sange, der allerede er valgt i denne session.
+
+  localStorage gemmer kun tekst/string.
+  Derfor bruger vi JSON.parse til at lave teksten om til et JavaScript-array igen.
+
+  Hvis der ikke er gemt nogen sange endnu, bruger vi en tom liste [].
+  */
   const votes = JSON.parse(localStorage.getItem(votesKey)) || [];
 
+  /* Tjekker om sangen allerede findes i votes-listen.
+
+  .some() går igennem listen og returnerer true,
+  hvis mindst én sang matcher den sang, brugeren prøver at tilføje.
+
+  Vi bruger både track_id og id, fordi sang-objekter kan have forskellige navne
+  alt efter hvordan de kommer fra frontend/backend.
+
+  Eksempel:
+  song.track_id eller song.id
+  */
   const alreadyChosen = votes.some((vote) => {
     return (vote.track_id || vote.id) === (song.track_id || song.id);
   });
 
+  /* Hvis sangen allerede er valgt, viser vi en fejlbesked
+  og stopper funktionen.
+
+  Det forhindrer, at samme sang bliver tilføjet flere gange.
+  */
   if (alreadyChosen) {
+    showError("This song is already added to My Votes.");
     return;
   }
 
+  /* Hvis sangen ikke allerede findes i listen,
+  tilføjer vi sangen til votes-arrayet.
+  */
   votes.push(song);
 
+  /* Gemmer den opdaterede votes-liste i localStorage.
+
+  JSON.stringify bruges, fordi localStorage kun kan gemme tekst.
+  Derfor laver vi arrayet om til en string, før det gemmes.
+  */
   localStorage.setItem(votesKey, JSON.stringify(votes));
+
+  /* Logger i console, så vi kan tjekke at sangen faktisk bliver gemt */
+  console.log("Song added to votes:", song);
+
+  /* Logger hele vote-listen for den aktuelle session */
+  console.log("Votes for session:", votes);
 }
 
-*/
 
-
-
-
-
-/* MIKKELS MUSIKAPPLIKATION 
-artists.js: 
-
-const element = document.getElementById('content');
-await loadAndRenderArtists(element);
-
-async function loadAndRenderArtists(element) {
-    element.textContent = 'Artists: Loading…';
-    const response = await fetch('/api/artists');
-    if (response.ok) {
-        const artists = await response.json();
-        renderArtists(artists, element);
-    } else {
-        element.textContent = 'Failed to load artists. Please try again later.';
-    }
-}
-
-function renderArtists(artists, element) {
-    element.textContent = `Artists: ${artists.length}`;
-    const ul = document.createElement('ul');
-    for (const artist of artists) {
-        const li = document.createElement('li');
-        renderArtist(artist, li);
-        ul.appendChild(li);
-    }
-    element.appendChild(ul);
-}
-
-function renderArtist(artist, element) {
-    const a = document.createElement('a');
-    a.href = `artist.html?id=${artist.id}`;
-    a.textContent = artist.stageName;
-    element.appendChild(a);
-}
-*/

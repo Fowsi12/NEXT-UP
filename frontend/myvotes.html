@@ -3,15 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <title>MyVotes</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel= "stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <script src="js/myvotes.js" defer></script>
+    <script src="js/myvotes.js" defer type="module"></script>
 </head>
   <body>
     <h1 class="myVotesHeader">My Votes</h1>
+
+    <!-- INVITE FRIEND BUTTON
+Denne knap viser session_id, så en ven kan skrive det ind på Join-siden.
+-->
+<button id="inviteFriendButton" class="inviteFriendButton">
+  Invite friend
+</button>
+
+<!-- INVITE FRIEND POPUP
+Denne popup er skjult som standard.
+Når man trykker på Invite friend, viser JavaScript session_id herinde.
+-->
+<div id="inviteFriendPopup" class="inviteFriendPopup">
+  <button id="closeInvitePopup" class="closeInvitePopup">✕</button>
+
+  <h3>Invite friend</h3>
+
+  <p>Send this Session ID to your friend:</p>
+
+  <p id="inviteSessionId" class="inviteSessionId"></p>
+
+  <p class="inviteHelpText">
+    Your friend should press Join on the front page and enter this ID.
+  </p>
+</div>
     
     <!-- MY VOTES WINDOW -->
     <ul class="myVotesList"></ul>
@@ -32,6 +57,7 @@
       </button>
     </div>
 
+
     <!--MENU BAR-->
     <div class="menu">
       <input type="checkbox" id="menu-toggle">
@@ -49,6 +75,8 @@
       </div>
     </div>
 
+<!--Tom div til errorBox. Lad den ligge nederst-->
+<div id="errorBox"></div>
   </body>
 </html>
 

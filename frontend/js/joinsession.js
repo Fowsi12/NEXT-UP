@@ -55,7 +55,7 @@ Det bruges ofte til at huske brugerpræferencer (som "dark mode"), indkøbskurve
     window.location.href = `mainpage.html?session_id=${result.session.session_id}`;
   } catch (error) {
     console.error(error);
-    message.textContent = "Der skete en fejl ved join session.";
+    showError("Der skete en fejl ved join session.");
   }
 }
 

@@ -223,3 +223,99 @@ id="errorBox
   padding: 12px 20px;
   border-radius: 100px;
 }
+
+/* INVITE FRIEND BUTTON */
+/* Knappen placeres i venstre side, så den ikke rammer My Votes-listen */
+.inviteFriendButton {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 50;
+
+  background-color: rgb(100, 2, 109);
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  padding: 12px 18px;
+  font-size: 16px;
+  cursor: pointer;
+
+  font-family: "Bebas Neue", sans-serif;
+}
+
+/* Hover-effekt når man holder musen over knappen */
+.inviteFriendButton:hover {
+  background-color: rgb(190, 5, 206);
+}
+
+/* INVITE FRIEND POPUP */
+/* Popup-boksen er skjult som standard og vises med JavaScript */
+.inviteFriendPopup {
+  position: fixed;
+
+  /* Popup åbner ovenover invite-knappen */
+  bottom: 85px;
+  left: 20px;
+
+  z-index: 60;
+
+  width: 300px;
+  box-sizing: border-box;
+
+  background-color: white;
+  color: rgb(60, 0, 70);
+
+  border: 3px solid #b300ff;
+  border-radius: 12px;
+
+  padding: 18px;
+
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+
+  display: none;
+}
+
+/* Overskrift inde i popup */
+.inviteFriendPopup h3 {
+  margin-top: 0;
+}
+
+/* Session-id'et gøres tydeligt, så det er nemt at kopiere/læse */
+.inviteSessionId {
+  background-color: rgb(245, 220, 250);
+  color: rgb(60, 0, 70);
+
+  padding: 10px;
+  border-radius: 8px;
+
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+
+  letter-spacing: 1px;
+}
+
+/* Lille hjælpetekst under session-id'et */
+.inviteHelpText {
+  font-size: 14px;
+}
+
+/* Luk-knappen i popup'ens hjørne */
+.closeInvitePopup {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  border-radius: 50%;
+
+  background-color: crimson;
+  color: white;
+
+  cursor: pointer;
+}
