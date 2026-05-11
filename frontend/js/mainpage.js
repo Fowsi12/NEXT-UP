@@ -231,28 +231,45 @@ function getFiveTracks(tracksForMood) {
 /*GENERERE SANGELISTE TIL MOODBOXES*/
 function renderTracks(tracks, box) {
     const moodTrackList = box.querySelector(".moodTrackList"); /* finder alle elementer i vores box med class="moodTrackList" */
-    moodTrackList.innerHTML=""; /*rydder indholdet i elementet sange fra pop-up vinduet*/
+    moodTrackList.innerHTML = ""; /* rydder indholdet i elementet sange fra pop-up vinduet */
     
-    if (tracks.length === 0) { /*hvis der ikke er mixed/shuffled nogen sange getFiveTracks funktionen*/
+    if (tracks.length === 0) { /* hvis der ikke er mixed/shuffled nogen sange getFiveTracks funktionen */
         showError("It was not possible to render any tracks for this mood");
         return;
     } else {
         tracks.forEach(function(track) {
-             /* opretter én række pr. sang, rækkerne har class="moodTrackRow" */
+            /* opretter én række pr. sang, rækkerne har class="moodTrackRow" */
             const moodTrackRow = document.createElement("div");
             moodTrackRow.classList.add("moodTrackRow");
             
             /* opretter en text container, class="trackText" */          
             const moodTrackText = document.createElement("p"); 
             moodTrackText.classList.add("moodTrackText");
-            /* indsætter indhold i text container ved at slå op i tracks ordbogen */
-            moodTrackText.textContent = `${track.track_title} - ${track.artist_name}`;
+
+            /* 
+            Indsætter sangens tekst.
+            track.track_title kommer fra backend/server.js.
+            track.artist_name virker kun, hvis backend også sender artist_name med.
+            Hvis artist_name ikke findes endnu, viser vi "Unknown artist" i stedet for undefined. 
+            */
+            moodTrackText.textContent = `${track.track_title} - ${track.artist || "Unknown artist"}`;
             
             /* opretter vote knap, class="voteBtn", indsætter billede */
-            const voteButton = document.createElement("button")
-            voteButton.className="voteBtn CircleBtn";
-            voteButton.innerHTML =`<img src="images/vote_button.png" class="centerBtnImg">`;
-            //TODO: tilføj class="centerBtnImg" til dette img
+            const voteButton = document.createElement("button");
+            voteButton.className = "voteBtn CircleBtn";
+            voteButton.innerHTML = `<img src="images/vote_button.png" class="centerBtnImg">`;
+
+            /* 
+            Når brugeren klikker på vote-knappen ved en sang,
+            gemmes sangen i localStorage via addSongToVotes(track).
+            */
+            voteButton.addEventListener("click", function () {
+                addSongToVotes(track);
+
+                voteButton.innerHTML = "Added";
+                voteButton.disabled = true;
+                voteButton.classList.add("voteBtnAdded");
+            });
             
             /* indsætter text og knap i rækkerne */
             moodTrackRow.appendChild(moodTrackText);
@@ -260,22 +277,9 @@ function renderTracks(tracks, box) {
 
             /* indsætter rækken i trackList div */
             moodTrackList.appendChild(moodTrackRow);
-
-            /* tilføjer eventlistener click til voteBtn med stemme funktion
-            voteBtn.addEventListener("click", function () {
-            addSongToVotes(track);
-            voteButton.textContent = "Added";
-            voteButton.disabled = true;
-            voteButton.style.hover = "cursor: not-allowed"
-            });*/
         });
     }
 }
-
-
-
-
-
 
 
 
@@ -387,3 +391,25 @@ function addSongToVotes(song) {
 }
 
 
+
+/* SONG QUEUE */
+/* knap til show/hide song queue */
+const queueBox = document.querySelector(".queueBox")
+const queueBtn = document.querySelector(".songQueueBtn");
+const queueBtnIconOpenClose = document.querySelector(".songQueueIconOpenClose")
+const queueBtnIcon = document.querySelector(".songQueueIcon")
+queueBtn.addEventListener("click", function () {
+  if (queueBox.classList.contains("open")) {
+    queueBox.classList.remove("open");
+    queueBtnIconOpenClose.src="images/arrow_left_menu.png";
+    queueBtnIconOpenClose.style="right: 22px";
+    queueBtnIcon.style="right: 2px";
+  } else {
+    queueBox.classList.add("open");
+    queueBtnIconOpenClose.src="images/arrow_right_menu.png";
+    queueBtnIconOpenClose.style="right: -4px";
+    queueBtnIcon.style="right: 16px";
+  } 
+/* man kunne også bruge ".toggle" her: 
+".toggle" tilføjer klassen hvis den ikke findes og fjerner den, hvis den findes*/
+});

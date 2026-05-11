@@ -107,10 +107,12 @@ async function onGetMoodTracks(request, response) {
     select  moods.mood_id,
             moods.title as mood,
             tracks.track_id,
-            tracks.title as track_title
+            tracks.title as track_title,
+            artists.stage_name as artist
     from    tracks_moods
     join    moods on tracks_moods.mood_id = moods.mood_id
     join    tracks on tracks_moods.track_id = tracks.track_id
+    join    artists on tracks.artist_id = artists.artist_id
   `);
   response.json(dbResult.rows);
 }
