@@ -17,7 +17,8 @@
 Denne knap viser session_id, så en ven kan skrive det ind på Join-siden.
 -->
 <button id="inviteFriendButton" class="inviteFriendButton">
-  Invite friend
+  <img src="images/person_add.png" class="inviteFriendIcon">
+  <p>Invite friend</p>
 </button>
 
 <!-- INVITE FRIEND POPUP
@@ -25,7 +26,9 @@ Denne popup er skjult som standard.
 Når man trykker på Invite friend, viser JavaScript session_id herinde.
 -->
 <div id="inviteFriendPopup" class="inviteFriendPopup">
-  <button id="closeInvitePopup" class="closeInvitePopup">✕</button>
+  <button id="closeInvitePopup" class="closeInvitePopup CircleBtn">
+    <img src="images/close_white.png" class="centerBtnImg">
+  </button>
 
   <h3>Invite friend</h3>
 
@@ -42,18 +45,18 @@ Når man trykker på Invite friend, viser JavaScript session_id herinde.
     <ul class="myVotesList"></ul>
     
     <!--knapper nederst-->
-    <div class="bottom-buttons">
-      <!--fortryd sidste knap-->
-      <button class="undoOne" title="Undo" onclick="undoLastVote()">
-      <img src="images/undo_arrow.png">
-      </button>
+    <div class="bottomButtons">
       <!--Slet alle votes knap-->
-      <button class="deleteAllVotes" title="Delete all votes" onclick="deleteAllVotes()">
-      <img src="images/cancel_all_votes.png">
+      <button class="deleteAllVotes CircleBtn" title="Delete all votes" onclick="deleteAllVotes()">
+      <img src="images/delete_all.png" class="centerBtnImg">
+      </button>
+      <!--fortryd sidste knap-->
+      <button class="undoOne CircleBtn" title="Undo" onclick="undoLastVote()">
+      <img src="images/undo_arrow.png" class="centerBtnImg">
       </button>
       <!--Bekræft votes knap-->
-      <button class="confirmVotes" title="Confirm votes" onclick="confirmVotes()">
-      <img src="images/confirm.png">
+      <button class="confirmVotes CircleBtn" title="Confirm votes" onclick="confirmVotes()">
+      <img src="images/confirm.png" class="centerBtnImg">
       </button>
     </div>
 

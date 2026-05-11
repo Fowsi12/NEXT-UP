@@ -14,6 +14,25 @@
   text-align: center;
   position: relative; /* Parent til Popup boxes, don't touch!! */
 }
+.CircleBtn { /* class til alle cirkelrunde knapper --- */
+  display: flex; 
+  /* display: flex 
+  dislay = hvilken retning children elementer skal liggge i. 
+  display: flex = elementets children kan styres flexibelt med vandret/lodret retning, centrering, spacing mellem children m.m. */
+  align-items: center; 
+  /* align-items:
+  med standard flex-direction (row/rækker) styrer vertikal placering.
+  align-itens: center = children elementer centreres lodret inde i denne parent */
+  justify-content: center;
+  /* justify-content: 
+  med standard flex-direction (row/rækker) styrer dette vandret placering */
+  border-radius: 50%;
+  border: none;
+}
+.centerBtnImg { /* class til sizing til alle img inde i knapper (knapper der kun har et billede) */
+  width: 100%;
+  height: auto;
+}
 /* ERROR MESSAGES:
 Til fejlbeskeder - vises centreret midt på siden og fader ud efter 5 sekunder
 id="errorBox 
@@ -53,7 +72,9 @@ id="errorBox
   top: 32.5%; /*jo højere værdi, jo længere væk fra toppen */
 
   width: 65%; /*størrelse på mood boxes*/
-  height: 85%;
+  height: fit-content; /*tilpasser selv størrelse efter hvor mange rækker med tracks, der genereres af js funktion til boxene */
+  padding: 2.5%; /* afstand fra kanter til indhold i boxen */
+
   opacity: 0; /*0=gennemsigtig, 1=uigennemsigtig,*/
   transition: opacity 0.5s;
   display: none; /* none=usynlig, block=synlig */
@@ -61,37 +82,68 @@ id="errorBox
 
   background-color: #2c352d;
   border: 4px solid #b300ff;
-  border-radius: 75px;
+  border-radius: 16px;
   color: white;
 }
 /* OVERSKRIFTER I MOOD POPUP BOXES */
 .moodTitle {
   text-align: center;
 }
-/* VOTE BUTTON I MOOD POPUP BOXES */
-.vote-btn {
-    position: relative;
-    padding: 8px 10px;
-
-    background:#45c226;
-    color: white;
-    border: none;
-    border-radius: 100px;
-
-    cursor: pointer;
-}
 /* CLOSE BUTTON I MOOD BOXES*/
 .closeMoodBox {
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 30px;
-  height: 30px;
-  border-radius: 100px;
+  width: 40px;
+  height: 40px;
   z-index: 11;
-
   cursor: pointer;
+  background-color: rgb(201, 0, 0);
 }
+.closeMoodBox:hover {
+  background-color: rgb(255, 63, 63);
+}
+.refreshTracks {
+  position: relative;
+  margin-bottom: 20px;
+  left: 95%;
+  width: 40px;
+  height: 40px;
+  z-index: 11;
+  cursor: pointer;
+  background-color: rgb(100, 2, 109);
+}
+.refreshTracks:hover {
+  background-color: rgb(190, 5, 206);
+}
+/* VOTE BUTTON I MOOD POPUP BOXES */
+.voteBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background:#45c226;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+/* FIVE TRACKS LIST I MOOD BOXES */
+.moodTrackRow {
+  display: flex; /* lægger tekst og voteBtn på samme linje */
+  justify-content: space-between; /* skubber tekst og voteBtn ud til hver side */
+  align-items: center; /*centrerer knappen vertikalt i forhold til tekst i samme div */
+  gap: 15px;
+  padding: 5px 20px 5px 20px; /* afstand fra venstre, top, højre, bund inde i rækkerne */
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  background-color: blueviolet;
+  border-radius: 16px;
+}
+/* TEKST DER VISER TRACKS & ARTIST I MOOD BOXES */
+.trackText {
+  margin: 0;
+  color: white;
+}
+
 
 /* MENU KNAP ØVERST TIL VENSTRE */
 /* Placering af menuen */
@@ -197,59 +249,62 @@ id="errorBox
   justify-content: space-between;
   align-items: center;
 }
-.bottom-buttons{
+/* div til position af undo/deleteAll/confirmVotes knapper */
+.bottomButtons{
   position: fixed;
   bottom: 20px;
   width: 100%;
   display: flex;
   justify-content: center;
-  gap:20px;
+  gap: 50px;
 }
-.undoOne {
-  background: rgb(158, 158, 0);
-  color: black;
-  padding: 12px 20px;
-  border-radius: 100px;
-}
-.deleteAllVotes {
-  background: rgb(177, 0, 0);
-  color: black;
-  padding: 12px 20px;
-  border-radius: 100px;
-}
+.undoOne, 
+.deleteAllVotes, 
 .confirmVotes {
-  background: rgb(0, 143, 0);
-  color: black;
-  padding: 12px 20px;
-  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: rgb(100, 2, 109);
+  cursor: pointer; 
 }
+.undoOne:hover,
+.deleteAllVotes:hover, 
+.confirmVotes:hover {
+  background-color: rgb(190, 5, 206);
+}
+
 
 /* INVITE FRIEND BUTTON */
 /* Knappen placeres i venstre side, så den ikke rammer My Votes-listen */
 .inviteFriendButton {
   position: fixed;
+  display: flex; 
+  align-items: center;
+  gap: 8px;
   bottom: 20px;
   left: 20px;
   z-index: 50;
-
-  background-color: rgb(100, 2, 109);
-  color: white;
-
+  
   border: none;
   border-radius: 8px;
 
-  padding: 12px 18px;
+  background-color: rgb(100, 2, 109);
+  padding: 0 25px;  
+  color: white;
   font-size: 16px;
-  cursor: pointer;
-
   font-family: "Bebas Neue", sans-serif;
+  
+  cursor: pointer;
 }
-
+.inviteFriendIcon {
+  height: 1.5em; /* em = relativ til elementets font-size. <Img> arver font-size og bliver automatisk skaleret, fordi det ligger inde i en button med display: flex */
+}
 /* Hover-effekt når man holder musen over knappen */
 .inviteFriendButton:hover {
   background-color: rgb(190, 5, 206);
 }
-
 /* INVITE FRIEND POPUP */
 /* Popup-boksen er skjult som standard og vises med JavaScript */
 .inviteFriendPopup {
@@ -276,12 +331,10 @@ id="errorBox
 
   display: none;
 }
-
 /* Overskrift inde i popup */
 .inviteFriendPopup h3 {
   margin-top: 0;
 }
-
 /* Session-id'et gøres tydeligt, så det er nemt at kopiere/læse */
 .inviteSessionId {
   background-color: rgb(245, 220, 250);
@@ -296,12 +349,10 @@ id="errorBox
 
   letter-spacing: 1px;
 }
-
 /* Lille hjælpetekst under session-id'et */
 .inviteHelpText {
   font-size: 14px;
 }
-
 /* Luk-knappen i popup'ens hjørne */
 .closeInvitePopup {
   position: absolute;
@@ -312,7 +363,6 @@ id="errorBox
   height: 28px;
 
   border: none;
-  border-radius: 50%;
 
   background-color: crimson;
   color: white;

@@ -22,99 +22,93 @@
       <!--MOOD MENU-->
       <!--tom div til moodbox de knapper, som JS opretter-->
       <div id="moodcontainer" class="moodMenu">
-      </div> 
-      <p id="errorText"></p>
+      </div>
 
       <!-- MOOD POPUP BOXES-->
       <div class="moodBox" id="energetic">
         <h2 class="moodTitle">Energetic tracks</h2>
-          <button class="refreshSongs">↻</button>
-          <button class="closeMoodBox">
-            ✕
+          <button class="refreshTracks CircleBtn" title="Refresh track selection">
+            <img src="images/refresh.png" class="centerBtnImg">
           </button>
-          <button class="vote-btn">
-            <img src="images/vote_button.png">
+          <button class="closeMoodBox CircleBtn" title="Close mood window">
+            <img src="images/close.png" class="centerBtnImg">
           </button>
-          <div class="trackList"></div>
+          <div class="moodTrackList"></div>
       </div>
 
       <div class="moodBox" id="chill">
         <h2 class="moodTitle">Chill tracks</h2>
-          <button class="refreshSongs">↻</button>
-          <button class="closeMoodBox">
-            ✕
+          <button class="refreshTracks CircleBtn" title="Refresh track selection">
+            <img src="images/refresh.png" class="centerBtnImg">
           </button>
-          <button class="vote-btn">
-            <img src="images/vote_button.png">
+          <button class="closeMoodBox CircleBtn" title="Close mood window">
+            <img src="images/close.png" class="centerBtnImg">
           </button>
-          <div class="trackList"></div>
+          <div class="moodTrackList"></div>
       </div>
 
       <div class="moodBox" id="party">
         <h2 class="moodTitle">Party tracks</h2>
-          <button class="refreshSongs">↻</button>
-          <button class="closeMoodBox">
-            ✕
+          <button class="refreshTracks CircleBtn" title="Refresh track selection">
+            <img src="images/refresh.png" class="centerBtnImg">
           </button>
-          <button class="vote-btn">
-            <img src="images/vote_button.png">
+          <button class="closeMoodBox CircleBtn" title="Close mood window">
+            <img src="images/close.png" class="centerBtnImg">
           </button>
-          <div class="trackList"></div>
+          <div class="moodTrackList"></div>
       </div>
 
       <div class="moodBox" id="happy">
         <h2 class="moodTitle">Happy tracks</h2>
-          <button class="refreshSongs">↻</button>
-          <button class="closeMoodBox">
-            ✕
+          <button class="refreshTracks CircleBtn" title="Refresh track selection">
+            <img src="images/refresh.png" class="centerBtnImg">
           </button>
-          <button class="vote-btn">
-            <img src="images/vote_button.png">
+          <button class="closeMoodBox CircleBtn" title="Close mood window">
+            <img src="images/close.png" class="centerBtnImg">
           </button>
-          <div class="trackList"></div>
+          <div class="moodTrackList"></div>
       </div>
 
       <div class="moodBox" id="romantic">
         <h2 class="moodTitle">Romantic tracks</h2>
-          <button class="refreshSongs">↻</button>
-          <button class="closeMoodBox">
-            ✕
+          <button class="refreshTracks CircleBtn" title="Refresh track selection">
+            <img src="images/refresh.png" class="centerBtnImg">
           </button>
-          <button class="vote-btn">
-            <img src="images/vote_button.png">
+          <button class="closeMoodBox CircleBtn" title="Close mood window">
+            <img src="images/close.png" class="centerBtnImg">
           </button>
-          <div class="trackList"></div>
+          <div class="moodTrackList"></div>
       </div>
       
       <div class="moodBox" id="lounge">
         <h2 class="moodTitle">Lounge tracks</h2>
-          <button class="refreshSongs">↻</button>
-          <button class="closeMoodBox">
-            ✕
+          <button class="refreshTracks CircleBtn" title="Refresh track selection">
+            <img src="images/refresh.png" class="centerBtnImg">
           </button>
-          <button class="vote-btn">
-            <img src="images/vote_button.png">
+          <button class="closeMoodBox CircleBtn" title="Close mood window">
+            <img src="images/close.png" class="centerBtnImg">
           </button>
-          <div class="trackList"></div>
+          <div class="moodTrackList"></div>
       </div>
     </div>
 
       <!--MENU BAR-->
-<div class="menu">
-  <input type="checkbox" id="menu-toggle">
+    <div class="menu">
+      <input type="checkbox" id="menu-toggle">
+    
+      <label for="menu-toggle" class="btn">
+        <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Menu
+      </label>
+    
+      <div class="menu-content">
+        <a href="mainpage.html"><i class="fa-brands fa-odysee"></i>&nbsp;&nbsp;&nbsp;Mood selection</a>
+        <a href="myvotes.html"><i class="fa-solid fa-list-ul"></i>&nbsp;&nbsp;&nbsp;My Votes</a>
+        <a href="index.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;&nbsp;&nbsp;Leave Session</a>
+      </div>
+    </div>
 
-  <label for="menu-toggle" class="btn">
-    <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Menu
-  </label>
 
-  <div class="menu-content">
-    <a href="mainpage.html"><i class="fa-brands fa-odysee"></i>&nbsp;&nbsp;&nbsp;Mood selection</a>
-    <a href="myvotes.html"><i class="fa-solid fa-list-ul"></i>&nbsp;&nbsp;&nbsp;My Votes</a>
-    <a href="index.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;&nbsp;&nbsp;Leave Session</a>
-  </div>
-</div>
-
-<!--Tom div til errorBox. Lad den ligge nederst-->
-<div id="errorBox"></div>
+      <!--Tom div til fejlmeddelelser. Lad den ligge nederst-->
+    <div id="errorBox"></div>
   </body>
 </html>
