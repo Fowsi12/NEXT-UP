@@ -94,6 +94,7 @@ id="errorBox
 /* OVERSKRIFTER I MOOD POPUP BOXES */
 .moodTitle {
   text-align: center;
+  color: white;
 }
 /* CLOSE BUTTON I MOOD BOXES*/
 .closeMoodBox {
@@ -138,7 +139,7 @@ id="errorBox
   justify-content: space-between; /* skubber tekst og voteBtn ud til hver side */
   align-items: center; /*centrerer knappen vertikalt i forhold til tekst i samme div */
   gap: 15px; /* minimum mellemrum mellem tekst og votebtn */
-  padding: 5px 20px 5px 20px; /* afstand fra venstre, top, højre, bund inde i rækkerne */
+  padding: 5px 40px 5px 40px; /* afstand fra top, højre, bund, venstre inde i rækkerne */
   border-left: 2px solid black;
   border-right: 2px solid black;
   border-bottom: 2px solid black;
@@ -236,21 +237,24 @@ id="errorBox
 }
 .myVotesList {
   color: white; /* text hvid i listen */
+  width: 50%;
 }
 /* Delete song button */
-.delete-btn {
-  background:#d50000;
+.deleteBtn {
+  background-color: rgb(201, 0, 0);
   width: 50px;
   height: 50px;
-  border-radius: 100px;
-  justify-content: center;
-  display: flex;
+}
+.deleteBtn:hover {
+  background-color: rgb(255, 63, 63);
 }
 .myVotesColumn {
   background: rgba(255,255,255,0.1);
   margin: 10px 0;
+  margin-right: 24px;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
+  gap: 15px; /* minimum mellemrum mellem tekst og votebtn - safety */
   
   display: flex;
   justify-content: space-between;
@@ -389,6 +393,7 @@ id="errorBox
   height: 50px;
   background-color: rgb(100, 2, 109);
   cursor: pointer; 
+  z-index: 19;
 }
 .songQueueIconOpenClose {
   position: absolute;

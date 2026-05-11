@@ -238,7 +238,7 @@ function renderTracks(tracks, box) {
         return;
     } else {
         tracks.forEach(function(track) {
-            /* opretter én række pr. sang, rækkerne har class="moodTrackRow" */
+            /* opretter én div pr. sang, rækkerne har class="moodTrackRow" */
             const moodTrackRow = document.createElement("div");
             moodTrackRow.classList.add("moodTrackRow");
             
@@ -259,13 +259,12 @@ function renderTracks(tracks, box) {
             voteButton.className = "voteBtn CircleBtn";
             voteButton.innerHTML = `<img src="images/vote_button.png" class="centerBtnImg">`;
 
-            /* 
+            /* Kalder addSongToVotes:
             Når brugeren klikker på vote-knappen ved en sang,
-            gemmes sangen i localStorage via addSongToVotes(track).
+            kaldes addSongToVotes funktionen, som gemmer sangen i localStorage
             */
             voteButton.addEventListener("click", function () {
                 addSongToVotes(track);
-
                 voteButton.innerHTML = "Added";
                 voteButton.disabled = true;
                 voteButton.classList.add("voteBtnAdded");

@@ -11,52 +11,49 @@
     <script src="js/myvotes.js" defer type="module"></script>
 </head>
   <body>
-    <h1 class="myVotesHeader">My Votes</h1>
+    <h1 class="binaryFlowHeader">BinaryFlow</h1>
+    <h2 class="myVotesHeader">My Votes</h2>
 
-    <!-- INVITE FRIEND BUTTON
-Denne knap viser session_id, så en ven kan skrive det ind på Join-siden.
--->
-<button id="inviteFriendButton" class="inviteFriendButton">
-  <img src="images/person_add.png" class="inviteFriendIcon">
-  <p>Invite friend</p>
-</button>
+      <!-- INVITE FRIEND BUTTON
+      Denne knap viser det session_id, som en ven kan bruge på Join-siden.-->
+    <button id="inviteFriendButton" class="inviteFriendButton">
+      <img src="images/person_add.png" class="inviteFriendIcon">
+      <p>Invite friend</p>
+    </button>
 
-<!-- INVITE FRIEND POPUP
-Denne popup er skjult som standard.
-Når man trykker på Invite friend, viser JavaScript session_id herinde.
--->
-<div id="inviteFriendPopup" class="inviteFriendPopup">
-  <button id="closeInvitePopup" class="closeInvitePopup CircleBtn">
-    <img src="images/close_white.png" class="centerBtnImg">
-  </button>
-
-  <h3>Invite friend</h3>
-
-  <p>Send this Session ID to your friend:</p>
-
-  <p id="inviteSessionId" class="inviteSessionId"></p>
-
-  <p class="inviteHelpText">
-    Your friend should press Join on the front page and enter this ID.
-  </p>
-</div>
+      <!-- INVITE FRIEND POPUP
+      Denne popup er skjult som standard.
+      Når man trykker på Invite friend, viser JavaScript session_id herinde.
+      -->
+    <div id="inviteFriendPopup" class="inviteFriendPopup">
+      <button id="closeInvitePopup" class="closeInvitePopup CircleBtn">
+        <img src="images/close.png" class="centerBtnImg">
+      </button>
+      <h3>Invite friend</h3>
+      <p>Send this Session ID to your friend:</p>
+      <p id="inviteSessionId" class="inviteSessionId"></p>
+      <p class="inviteHelpText">
+        Your friend should press Join on the front page and enter this ID.
+      </p>
+    </div>
     
-    <!-- MY VOTES WINDOW -->
-    <ul class="myVotesList"></ul>
-    
-    <!--knapper nederst-->
+      <!-- MY VOTES WINDOW -->
+      <div id="centerContent">
+        <ul class="myVotesList"></ul>
+      </div>
+      <!--knapper nederst-->
     <div class="bottomButtons">
-      <!--Slet alle votes knap-->
+        <!--Slet alle votes knap-->
       <button class="deleteAllVotes CircleBtn" title="Delete all votes" onclick="deleteAllVotes()">
-      <img src="images/delete_all.png" class="centerBtnImg">
+        <img src="images/delete_all.png" class="centerBtnImg">
       </button>
-      <!--fortryd sidste knap-->
+        <!--fortryd sidste knap-->
       <button class="undoOne CircleBtn" title="Undo" onclick="undoLastVote()">
-      <img src="images/undo_arrow.png" class="centerBtnImg">
+        <img src="images/undo_arrow.png" class="centerBtnImg">
       </button>
-      <!--Bekræft votes knap-->
+        <!--Bekræft votes knap-->
       <button class="confirmVotes CircleBtn" title="Confirm votes" onclick="confirmVotes()">
-      <img src="images/confirm.png" class="centerBtnImg">
+        <img src="images/confirm.png" class="centerBtnImg">
       </button>
     </div>
 

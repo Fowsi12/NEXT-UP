@@ -1,16 +1,11 @@
 /* MY VOTES
-
 Denne side viser de sange, brugeren har valgt på mainpage.html.
-
-Sangene bliver ikke hardcoded direkte i HTML længere.
+Valgene bliver ikke hardcoded direkte i HTML.
 I stedet henter vi dem fra localStorage.
-
-Vi gemmer sangene ud fra den aktuelle session_id.
+Vi gemmer sangene ud fra det aktuelle session_id.
 Det betyder, at hver session har sin egen liste af valgte sange.
-
 Eksempel:
-Hvis session_id er 12, gemmes sangene under:
-votes_session_12
+Hvis session_id er 12, gemmes sangene under: votes_session_12
 */
 
 /* ERROR BOX: 
@@ -24,7 +19,8 @@ Herunder er <ul class="myVotesList"></ul> i myvotes.html.
 Det er inde i denne liste, at vi senere indsætter sangene med JavaScript. 
 */
 const myVotesList = document.querySelector(".myVotesList");
-
+/* variabel til historik over slettede sange (til undo)*/
+let lastDeletedSong = null;
 /* 
 Derefter finder vi den session brugeren er i.
 session_id bliver gemt i localStorage, når brugeren enten:
@@ -188,9 +184,9 @@ Eksempel på resultat:
 Opretter slet-knappen til den enkelte sang 
 */
     const deleteButton = document.createElement("button");
-    deleteButton.className = "delete-btn";
-    deleteButton.title = "Delete song";
-    deleteButton.textContent = "X";
+    deleteButton.className = "deleteBtn CircleBtn";
+    deleteButton.title = "Remove track from my votes";
+    deleteButton.innerHTML = `<img src="images/delete.png" class="centerBtnImg">`
 
 /* 
 Når man klikker på slet-knappen, sletter vi kun denne sang.
