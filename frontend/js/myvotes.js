@@ -1,28 +1,252 @@
-/* MY VOTES
-Denne side viser de sange, brugeren har valgt på mainpage.html.
-Valgene bliver ikke hardcoded direkte i HTML.
-I stedet henter vi dem fra localStorage.
-Vi gemmer sangene ud fra det aktuelle session_id.
-Det betyder, at hver session har sin egen liste af valgte sange.
+/* MY VOTES: 
+Dette JS håndterer de sange, brugeren har stemt på via mainpage.html.
+Stemmerne bliver ikke hardcoded direkte i HTML.
+I stedet gemmes de i og hentes fra localStorage.
+Stemmerne gemmes og hentes ud fra det aktuelle session_id, 
+som fungerer som en nøgle til at hente de korrekte votes.
+Det betyder, at hver bruger på hver session har sin egen midlertidige liste af sange, 
+som brugeren har stemt på.
+Den midlertidige liste af sange, som brugeren har stemt på ryddes ved at slette alle eller bekræfte alle stemmer.
 Eksempel:
-Hvis session_id er 12, gemmes sangene under: votes_session_12
-*/
+Hvis session_id er 12, gemmes de sange, bruger har stemt på, i LocalStorage under: votes_session_12 */
 
-/* ERROR BOX: 
-viser fejltekst i en popup box der forsvinder af sig selv
-Kald blot funktionen showError("") og boksen vises med tekst i*/
+
+
+  /* ERROR BOX:
+  viser fejltekst i en popup box, der forsinder af sig selv.
+  Kald blot funktionen showError(""), og boksen vises med tekst i */
 import { showError } from './ui_errorbox.js';
 const errorBox = document.getElementById("errorBox");
 
-/* 
-Herunder er <ul class="myVotesList"></ul> i myvotes.html.
-Det er inde i denne liste, at vi senere indsætter sangene med JavaScript. 
+
+
+  /* myVotesList: 
+Vi deklærer en const variabel vha. querySelector, som slår op i html 
+og finder det første element med class="myVotesList" (fra myvotes.html).
+Det er i dette element, at vi senere vha. JS render listen med sange, 
+som brugeren ønsker at stemme på. 
 */
 const myVotesList = document.querySelector(".myVotesList");
-/* variabel til historik over slettede sange (til undo)*/
-let lastDeletedSong = null;
-/* 
-Derefter finder vi den session brugeren er i.
+  /* lastDeletedTrack:
+variabel til historik over slettede sange (til undo funktion) */
+let lastDeletedTrack = null;
+  /* DOMContentLoaded:
+Når html er fuldt indlæset og parsed(fortolket), kaldes renderVotes().
+*/
+document.addEventListener("DOMContentLoaded", renderVotes());
+
+
+
+/* RENDER LISTEN AF TRACKS SOM BRUGER HAR STEMT PÅ */ 
+  /* renderVotes():
+  Funktionen render en liste af tracks, som brugeren har stemt (votes) på i den session, han er i.
+  Funktionen bliver kaldt når: 
+  * myvotes.html åbnes,
+  * brugeren sletter en sang på listen,
+  * brugeren fortryder slet af en sang på listen,
+  * brugeren sletter alle sange på listen.
+  På den måde bliver listen altid opdateret efter ændringer.
+  */
+function renderVotes() {
+    /* checkSession():
+    Vi kalder checkSession for at hente SessionId. 
+    Hvis der ikke er en session, stopper funktionen ved if (!sessionId) {return;}.
+    I checkSession() sendes brugeren alligevel tilbage til index.html, hvis !sessionId. */
+  const sessionId = checkSession();
+  if (!sessionId) {
+    return;
+  }
+
+    /* getSessionVotes():
+    Henter tracks som brugeren har stemt på, men ikke bekræftet eller slettet endnu.
+    gemmes som værdi i variablen votes.
+    Funktionen benytter LocalStorage. 
+    Værdien vil være et array. */
+  const votes = getSessionVotes();
+    /* elementet gøres tomt:
+    I tilfælde af, at der allerede står noget på listen. 
+    Vi undgår, at de samme sange bliver vist flere gange efter hinanden,
+    hver gang renderVotes() bliver kaldt. */
+  myVotesList.innerHTML = "";
+
+    /* if (votes.length === 0):
+    Hvis man ikke har valgt nogen sange endnu, er listen tom, og der 
+    vises både tekst og en besked om, at man ikke har valgt nogen sange */
+  if (votes.length === 0) {
+    const emptyMessage = document.createElement("li");
+    emptyMessage.className = "zeroVotesMessage";
+    emptyMessage.textContent = "Du har ikke valgt nogen sange";
+    showError("Du har ikke valgt nogen sange");
+    myVotesList.appendChild(emptyMessage);
+    return;
+  }
+
+    /* forEach:
+    forEach metoden går gennem alle indexes i votes array'et én ad gangen.
+    track = det enkelte track
+    index = sangens placering i arrayet
+    */
+  votes.forEach(function(track, index) {
+      /* Opretter et <li>-element pr. track */
+    const li = document.createElement("li");
+      /* Giver <li> class="myVotesColumn", så vi kan style den i CSS */
+    li.className = "myVotesColumn";
+      /* Opretter et <div>-element til track title og delete knap */
+    const trackText = document.createElement("div");
+
+      /* Render tekst med nummerering, sangtitel og artist:
+          Eksempel på resultat:
+          1. Pink + White - Frank Ocean 
+
+      * `${...}` kaldes en template string.
+        Den gør det muligt at blande almindelig tekst og JavaScript-værdier.
+
+      * index + 1:
+        Viser nummerering i listen og starter fra 1.
+        Index starter altid på 0 i JavaScript.
+        Derfor bruger vi index + 1, så listen starter ved 1 i stedet for 0.
+
+      * getTrackTitle(Track):
+        Kalder funktion med track objektet som argument og returnerer track_title.
+
+      * getArtistName(Track):
+        Kalder funktion med track objektet som argument og returnerer artist.
+      */
+    trackText.textContent = `${index + 1}. ${getTrackTitle(track)} - ${getArtistName(track)}`;
+
+      /* Opretter en slet-knap pr. track 
+        Knappen tildeles properties: classes og title og vi tilføjer et img-tag i knappen. 
+        Knappen tilføjes en event listener "click", som vil kalde funktionen removeTrack. 
+        getTrackId(track) bruges, fordi sangens id enten kan hedde: track_id eller id. 
+        removeTrack(...) fjerner sangen fra localStorage og opdaterer listen.*/
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "deleteBtn CircleBtn";
+    deleteButton.title = "Remove track from my votes";
+    deleteButton.innerHTML = `<img src="images/delete.png" class="centerBtnImg">`
+    deleteButton.addEventListener("click", function() {
+      removeTrack(getTrackId(track));
+    });
+      /* Lægger nummerering, sangtitel og artist navn ind i parent elementet <li> */
+    li.appendChild(trackText);
+      /* Lægger delete-knappen ind i parent elementet <li> */
+    li.appendChild(deleteButton);
+      /* Lægger hele <li> som child ind i parent elementet <ul class="myVotesList"> */
+    myVotesList.appendChild(li);
+  });
+}
+
+
+
+/* FJERN ÉT TRACK FRA MYVOTES */
+/* removeTrack(trackId):
+Når brugeren klikker på slet-knappen (class="deleteBtn"), slettes sangen på samme række som knappen.
+track_Id er id'et på den sang, der skal fjernes.
+*/
+function removeTrack(trackId) {
+/* getSessionVotes():
+Kalder funktionen og henter den nuværende liste af valgte sange på MyVotes fra LocalStorage */
+  let votes = getSessionVotes();
+/* newVotes =[]:
+Vi laver in-place filtrering: vi tager et array, fjerner et uønsket element og gemmer det nye array i variablen.
+Hvis et trackId fra votes array'et !== det trackId, som brugeren har trykket slet på, pushes det til det nye array. 
+Hvis et trackId fra votes array'et === det trackId, som brugeren har trykket slet på, hopper vi til næste index. 
+newVotes bliver derfor et array med de sange, der er tilbage, udover den, som brugeren har trykket slet på. 
+Vi beholder kun de sange, hvor sangens id IKKE matcher trackId.
+*/
+  let newVotes = [];
+  let i = 0;
+  while (i < votes.length) {
+    if (getTrackId(votes[i]) !== trackId) {
+      newVotes.push(votes[i]);
+    }
+    if (getTrackId(votes[i]) === trackId) {
+      lastDeletedTrack = votes[i]
+      console.log("Last deleted track: " + lastDeletedTrack.track_title + " - " + lastDeletedTrack.artist)
+    }
+    i++;
+  }
+  votes = newVotes;
+/* saveSessionVotes(votes):
+Det opdaterede array gemmes i localStorage */
+  saveSessionVotes(votes);
+
+/* renderVotes():
+Render listen med MyVotes igen, så siden opdateres med det samme */
+  renderVotes();
+}
+
+
+
+/* GEMMER ARRAY MED TRACKS TIL MYVOTES LISTEN */
+/* saveSessionVotes:
+Gemmer valgte sange for den aktuelle bruger til MyVotes listen.
+De bruges senere, når de tilføjes til vores afspilningskø.
+
+votesKey = henter string med current session_id (fx votes_session_1)
+localStorage kan kun gemme tekst/string.
+Derfor bruger vi JSON.stringify til at lave arrayet om til tekst.
+*/
+function saveSessionVotes(votes) {
+  const votesKey = getVotesStorageKey();
+  localStorage.setItem(votesKey, JSON.stringify(votes));
+}
+/* HENTER LISTE MED TRACKS TIL MYVOTES FRA LOCALSTORAGE */
+/* getSessionVotes:
+localStorage gemmer kun tekst/string.
+Derfor bruger vi JSON.parse til at fortolke/oversætte teksten til et JavaScript-array.
+votesKey = en liste med de sange, som ligger i MyVotes listen for brugeren. 
+Hvis der ikke findes nogen gemte votes endnu, returnerer vi en tom liste [].
+*/
+function getSessionVotes() {
+  const votesKey = getVotesStorageKey();
+  return JSON.parse(localStorage.getItem(votesKey)) || [];
+}
+
+
+
+/* OPRET UNIK STRING PR. SESSION */
+/* getVotesStorageKey:
+Kalder getCurrentSessionId for at finde session_id. 
+Den returnerer det som votes_session_##. 
+Den her funktion muliggør, at hver midlertidige MyVotes-liste er unik for hver session, 
+ved at give dem et navn ud fra hvilken session brugeren er i fra localStorage.
+Vi bruger session_id i navnet, så hver session har sin egen MyVotes-liste.
+
+Eksempel:
+finder: session_id = 5
+returner: "votes_session_5"
+*/
+function getVotesStorageKey() {
+  const sessionId = getCurrentSessionId();
+  return `votes_session_${sessionId}`;
+}
+
+
+
+/*TJEKKER OM BRUGER ER I EN SESSION ELLERS KICK*/
+//TODO: Er denne funktion nødvendig? 
+/* checkSession:
+Failsafe funktion. 
+Funktionen "checkSession" tjekker om brugeren rent faktisk er i en session.
+Hvis der ikke findes et session_id i localStorage, 
+bliver brugeren sendt tilbage til forsiden.
+Det forhindrer, at man går direkte ind på myvotes.html uden først at have
+oprettet eller joinet en session.
+*/
+function checkSession() {
+  const sessionId = getCurrentSessionId();
+  if (!sessionId) {
+    window.location.href = "index.html";
+    return null;
+  }
+  return sessionId;
+}
+
+
+
+/* FINDER SESSION_ID FRA LOCALSTORAGE */
+/* getCurrentSessionId:
+Finder det session_id, som brugeren er i.
 session_id bliver gemt i localStorage, når brugeren enten:
 1.Opretter en session i createsession.js
 2.Joiner en session i joinsession.js
@@ -31,263 +255,54 @@ function getCurrentSessionId() {
   return localStorage.getItem("session_id");
 }
 
-/* 
-Derefter tjekker vi om brugeren faktisk er i en session.
-Hvis der ikke findes et session_id i localStorage, bliver brugeren sendt tilbage til forsiden.
 
-Det forhindrer, at man går direkte ind på myvotes.html uden først at have
-oprettet eller joinet en session.
+
+/* FIND TRACK_ID */
+/* getTrackId: 
+Funktionen har track som som argument. 
+track er en ordbog med fx:
+{mood_id: 1, mood: 'Energetic', track_id: 13, track_title: 'Happier', artist: 'Marshmello'}
+Den slår op i ordborgen på track_id eller id. 
+
+Funktionen er fleksibel, for at sikre at vi får et id retur. 
+Defensiv programmering i tilfælde af fejl fra DB eller data fra flere kilder. 
+I tilfælde af, at vores sang-objekter måske ikke altid bruger samme property-navne: 
+Eksempel 1: { track_id: 3, track_title: "Track", artist_name: "Artist" }
+Eksempel 2: { id: 3, title: "Track", artist: "Artist" }
+Hvis track_id er undefined eller null returnerer vi blot id. Ellers returnerer vi track_id. 
 */
-function checkSession() {
-  const sessionId = getCurrentSessionId();
-
-  if (!sessionId) {
-    window.location.href = "index.html";
-    return null;
+function getTrackId(track) {
+  if (track.track_id === undefined || track.track_id === null) {
+    return track.id
+  } else {
+  return track.track_id
   }
-
-  return sessionId;
 }
 
-/* 
-Når vi så har gjort det laver vi navnet på den localStorage-key, hvor votes skal gemmes.
-
-Vi bruger session_id i navnet, så hver session har sin egen vote-liste.
-
-Eksempel:
-session_id = 5
-votesKey = "votes_session_5"
-*/
-function getVotesStorageKey() {
-  const sessionId = getCurrentSessionId();
-  return `votes_session_${sessionId}`;
-}
-
-/* 
-Så hentes alle valgte sange for den aktuelle session.
-
-localStorage gemmer kun tekst/string.
-Derfor bruger vi JSON.parse til at lave teksten om til et JavaScript-array igen.
-
-Hvis der ikke findes nogen gemte votes endnu, returnerer vi en tom liste [].
-*/
-function getSessionVotes() {
-  const votesKey = getVotesStorageKey();
-  return JSON.parse(localStorage.getItem(votesKey)) || [];
-}
-
-/* 
-Derefter gemmes alle valgte sange for den aktuelle session.
-
-votes er et JavaScript-array.
-localStorage kan kun gemme tekst/string.
-Derfor bruger vi JSON.stringify til at lave arrayet om til tekst.
-*/
-function saveSessionVotes(votes) {
-  const votesKey = getVotesStorageKey();
-  localStorage.setItem(votesKey, JSON.stringify(votes));
-}
-
-/* 
-Den måde sangene vises på siden,
-bliver kaldt når:
-Enten når myvotes.html åbnes,
-Eller når man sletter en sang,
-Eller når man fortryder sidste vote,
-Eller når man sletter alle votes.
-
-På den måde bliver listen altid opdateret efter ændringer.
-*/
-function renderVotes() {
-  const sessionId = checkSession();
-
-  /* 
-  Hvis der ikke er en session, stopper funktionen her.
-  checkSession() har allerede sendt brugeren tilbage til index.html. 
-  */
-  if (!sessionId) {
-    return;
+/* getTrackTitle:
+Slår op i track objektet og returnerer track_title.
+Hvis undefined eller null: "Error: Unable to load track title"*/
+function getTrackTitle(track) {
+  if (track.track_title === undefined || track.track_title === null) {
+    return "Unknown track title"
+  } else {
+  return track.track_title
   }
+}
 
-  /* 
-  Her hentes de gemte sange for den aktuelle session 
-  */
-  const votes = getSessionVotes();
-
-  /* 
-  Tømmer listen først.
-  Det gør vi for at undgå, at de samme sange bliver vist flere gange,
-  hver gang renderVotes() bliver kaldt. 
-  */
-  myVotesList.innerHTML = "";
-
-  /* 
-  Hvis listen er tom, viser vi en besked i stedet for en tom side 
-  */
-  if (votes.length === 0) {
-    const emptyMessage = document.createElement("li");
-    emptyMessage.className = "myVotesColumn";
-    emptyMessage.textContent = "Du har ikke valgt nogen sange endnu.";
-    showError("Du har ikke valgt nogen sange endnu.");
-    myVotesList.appendChild(emptyMessage);
-    return;
+/* getArtistName:
+Slår op i track objektet og returnerer artist_name. 
+Hvis undefined eller null: "Unable to load artist name"
+*/
+function getArtistName(track) {
+  if (track.artist_name === undefined || track.artist_name === null) {
+    return "Unable to load artist name"
+  } else {
+  return track.artist_name
   }
-
-/* 
-Derefter går vi igennem alle valgte sange én ad gangen.
-
-song = den enkelte sang
-index = sangens placering i arrayet
-
-index starter altid på 0 i JavaScript.
-Derfor bruger vi index + 1, så listen starter ved 1 i stedet for 0.
-*/
-  votes.forEach((song, index) => {
-/* 
-Opretter et <li>-element til én sang 
-*/
-    const li = document.createElement("li");
-
-/* 
-Giver <li> samme class som vi bruger i CSS,
-så sangen får samme styling som resten af siden. 
-*/
-li.className = "myVotesColumn";
-
-/* 
-Opretter et <span>-element til selve sangteksten.
-Vi bruger span, fordi delete-knappen også skal ligge inde i samme <li>. 
-*/
-    const songText = document.createElement("span");
-
-/* Her laver vi teksten, der vises på siden.
-
-`${...}` kaldes en template string.
-Den gør det muligt at blande almindelig tekst og JavaScript-værdier.
-
-index + 1:
-Viser sangens nummer i listen.
-index starter på 0, så derfor lægger vi 1 til.
-
-getSongTitle(song):
-Finder sangens titel.
-Funktionen kan både håndtere song.track_title og song.title.
-getArtistName(song):
-Finder kunstnerens navn.
-Funktionen kan både håndtere song.artist_name og song.artist.
-Eksempel på resultat:
-1. Pink + White - Frank Ocean
-*/
-    songText.textContent = `${index + 1}. ${getSongTitle(song)} - ${getArtistName(song)}`;
-
-/* 
-Opretter slet-knappen til den enkelte sang 
-*/
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "deleteBtn CircleBtn";
-    deleteButton.title = "Remove track from my votes";
-    deleteButton.innerHTML = `<img src="images/delete.png" class="centerBtnImg">`
-
-/* 
-Når man klikker på slet-knappen, sletter vi kun denne sang.
-
-getSongId(song) bruges, fordi sangens id kan hedde enten:
-- track_id
-- id
-removeSong(...) fjerner sangen fra localStorage og opdaterer listen.
-*/
-    deleteButton.addEventListener("click", () => {
-      removeSong(getSongId(song));
-    });
-
-/* Lægger sangteksten ind i <li> */
-    li.appendChild(songText);
-
-/* Lægger delete-knappen ind i samme <li> */
-    li.appendChild(deleteButton);
-
-/* Lægger hele <li> ind i <ul class="myVotesList"> */
-    myVotesList.appendChild(li);
-  });
 }
 
-/* 
-Herefter finder vi sangens id.
 
-Vi har lavet funktionen fleksibel, fordi vores gruppes sang-objekter
-måske ikke altid bruger samme property-navne.
-
-Hvis objektet har track_id, bruger vi det.
-Ellers prøver vi id.
-
-Eksempel 1:
-{ track_id: 3, track_title: "Song", artist_name: "Artist" }
-
-Eksempel 2:
-{ id: 3, title: "Song", artist: "Artist" }
-*/
-function getSongId(song) {
-  return song.track_id || song.id;
-}
-
-/* 
-Efter finder vi sangens titel.
-
-Nogle steder kan sangens titel hedde track_title.
-Andre steder kan den hedde title.
-
-Hvis ingen af dem findes, viser vi "Ukendt sang",
-så siden ikke crasher eller viser undefined.
-*/
-function getSongTitle(song) {
-  return song.track_title || song.title || "Ukendt sang";
-}
-
-/* 
-Derefter finder vi kunstnerens navn.
-
-Nogle steder kan kunstneren hedde artist_name.
-Andre steder kan den hedde artist.
-
-Hvis ingen af dem findes, viser vi "Ukendt artist".
-*/
-function getArtistName(song) {
-  return song.artist_name || song.artist || "Ukendt artist";
-}
-
-/* 
-Her har vi gjort det muligt at slette én sang fra votes.
-
-track_Id er id'et på den sang, der skal fjernes.
-*/
-function removeSong(trackId) {
-/* 
-Henter den nuværende liste af valgte sange 
-*/
-  let votes = getSessionVotes();
-
-/* 
-filter laver et nyt array.
-Vi beholder kun de sange, hvor sangens id IKKE matcher track_Id.
-
-Det betyder:
-- Hvis sangens id er det samme som track_Id, fjernes den.
-- Alle andre sange bliver i listen.
-*/
-  votes = votes.filter((song) => {
-    return getSongId(song) !== trackId;
-  });
-
-/* 
-Gemmer den nye opdaterede liste i localStorage 
-*/
-  saveSessionVotes(votes);
-
-/* 
-Tegner listen igen, så siden opdateres med det samme 
-*/
-  renderVotes();
-}
 
 /* 
 Fortryder den sidst valgte sang.
@@ -347,7 +362,7 @@ onclick="undoLastVote()"
 
 Uden window.undoLastVote = undoLastVote ville HTML'en ikke kunne finde funktionen.
 */
-window.removeSong = removeSong;
+window.removeTrack = removeTrack;
 window.undoLastVote = undoLastVote;
 window.deleteAllVotes = deleteAllVotes;
 window.confirmVotes = confirmVotes;
@@ -406,10 +421,3 @@ function hideInviteFriendPopup() {
 }
 
 
-/* 
-Når myvotes.html åbnes, kører renderVotes() med det samme.
-
-Det betyder, at siden automatisk viser de sange,
-der allerede er gemt for den aktuelle session.
-*/
-renderVotes();

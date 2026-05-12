@@ -24,19 +24,17 @@ server.listen(port, onServerReady);
 Tager session_id fra frontend, søger efter sessionen i databasen
 og sender enten sessionen tilbage eller en fejlbesked.
 */
-
 async function onJoinSession(request, response) {
   const sessionId = Number(request.body.session_id);
 
   if (!sessionId) {
     return response.status(400).json({
       success: false,
-      message: "Session ID mangler eller er ugyldigt.",
+      message: "Session ID is missing in database or is invalid",
     });
   }
 
-  const dbResult = await db.query(
-    `
+  const dbResult = await db.query(`
     select  session_id,
             is_private,
             created_at
@@ -49,13 +47,13 @@ async function onJoinSession(request, response) {
   if (dbResult.rows.length === 0) {
     return response.status(404).json({
       success: false,
-      message: "Session blev ikke fundet.",
+      message: "Session was not found",
     });
   }
 
   response.json({
     success: true,
-    message: "Session fundet.",
+    message: "Session found",
     session: dbResult.rows[0],
   });
 }
@@ -87,7 +85,6 @@ async function onCreateSharedSession(request, response) {
 /* Henter moods:
 Funktion til moods, hvor vi henter alle moods fra vores database 
 og sender dem som JSON til frontend.
-$=antal argumenter til response
 */
 async function onGetStartMoods(request,response){
   const dbResult = await db.query(`

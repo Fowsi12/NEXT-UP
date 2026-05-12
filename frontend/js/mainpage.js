@@ -20,8 +20,8 @@ let isMoodBoxOpen = null // variabel til at se, om MoodBox er åben eller lukket
 let allTracks = []; /* variabel til alle tracks */
 
 
-
 // TODO: Vis noget loading inden knapperne er dannet, eller spørg Mikkel til loading rækkefølgen?
+
 
 /* HENT ALLE TRACKS & MOODS FRA DB */
 document.addEventListener("DOMContentLoaded", loadTracks);
@@ -37,9 +37,6 @@ async function loadTracks() {
         showError("It was not possible to load any tracks from the database!");
     }
 }
-
-
-
 
 
 /* MOOD BUTTONS GENERATOR */
@@ -59,7 +56,8 @@ async function loadMoods() {
         En failsafe, der rydder containeren. 
         I tilfælde af at der allerede er indhold i den. 
         Så undgår vi, at den opretter contet 2 gange */
-    
+        /* forEach: 
+        For hvert element i NodeList'en render vi en knap med attributes og tekstindhold*/
         moodsList.forEach(function(mood) {
             const div = document.createElement("div");/*laver en div rundt om knappen*/
             const button = document.createElement("button"); /*laver selveste knappen*/
@@ -90,22 +88,13 @@ async function loadMoods() {
 }
 
 
-
-
-
-
 /* OPEN MOOD BOXES */
 let targetBox
 const moodBoxes = document.querySelectorAll(".moodBox");
 /* .querySelectorAll:
-finder alle elementer med class="closeMoodBox"
+finder alle elementer med class="MoodBox"
 og returnerer en NodeList (liste med elementer)*/
-
-/* forEach: 
-følgende gøres for hvert element i NodeList'en*/
 document.addEventListener("click", function(event) {
-/*moodBoxes.forEach:
-Lukker evt. åbne Moodboxes, hvis man klipper på en anden*/
     const button = event.target.closest(".openMoodBox"); /* button rammer det element, der er tættest på med sit click event */
     if (button) {
         targetBox = button.dataset.target;
@@ -137,6 +126,7 @@ I html har hver knap sit eget data-target, så de kan pege på hver sin class*/
     }
 });
 
+
 /* REFRESH TRACKS BUTTON */
 const refreshTracksButton = document.querySelectorAll(".refreshTracks"); /* vælger vores button med class="refreshTracks" */
 refreshTracksButton.forEach(function(button) {
@@ -149,6 +139,7 @@ refreshTracksButton.forEach(function(button) {
         renderTracks(fiveTracks, box) /* vi kalder funktionen renderTracks for at render de 5 nye tracks i moodBox */
     });
 });
+
 
 /* CLOSE MOOD BOXES */
 const closeMoodBoxButtons = document.querySelectorAll(".closeMoodBox"); 
@@ -188,6 +179,7 @@ venter 500 ms inden boxen bliver helt skjult igen,
 fordi den har style="transition: opacity 0.5s"*/
 }
 
+
 /* Funktion til at filtrerer sange fra allTracks efter mood: 
 Funktionen returner via et opslag på mood i den track parameter vi giver den
 Og hvis mood === mood, tages track med i resultatet
@@ -209,7 +201,6 @@ function getTracksForMood(allTracks, mood) {
 }
 
 
-
 /* Funktion til at blande sange og returnere 5 */
 // TODO: Spørg Mikkel om vi har en side-effekt her? Er det korrekt måde at slice et array på? // Lige nu: Hver gang vi kalder funktionen, skal vi gøre det med alle sange forfra for at vi ikke får biprodukt. 
 function getFiveTracks(tracksForMood) {
@@ -227,7 +218,6 @@ function getFiveTracks(tracksForMood) {
 }
 
 
-                        //TODO: træk artist_name med fra DB//
 /*GENERERE SANGELISTE TIL MOODBOXES*/
 function renderTracks(tracks, box) {
     const moodTrackList = box.querySelector(".moodTrackList"); /* finder alle elementer i vores box med class="moodTrackList" */
