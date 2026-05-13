@@ -17,7 +17,7 @@ async function joinSession() {
   const sessionId = sessionInput.value.trim();
 
   if (!sessionId) {
-    showError("Skriv et session ID.");
+    showError("Insert session ID first");
     return;
   }
 
@@ -34,7 +34,7 @@ async function joinSession() {
     const result = await response.json();
 
     if (!response.ok) {
-      showError("Kunne ikke joine session.");
+      showError("Session does not exist");
       return;
     }
 
@@ -46,16 +46,11 @@ Det bruges ofte til at huske brugerpræferencer (som "dark mode"), indkøbskurve
     localStorage.setItem("session_id", result.session.session_id);
     localStorage.setItem("is_private", result.session.is_private);
 // Gemmer session_id i browseren, så andre sider kan vide hvilken session brugeren er i.
-
-
-
-    console.log("Joined session:", result.session);
-
 // Hvis join lykkes, sendes brugeren videre til hovedsiden "mainpage.html".
     window.location.href = `mainpage.html?session_id=${result.session.session_id}`;
   } catch (error) {
     console.error(error);
-    showError("Der skete en fejl ved join session.");
+    showError("An error occured while connecting to session");
   }
 }
 

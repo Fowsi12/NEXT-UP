@@ -242,7 +242,7 @@ function renderTracks(tracks, box) {
             track.artist_name virker kun, hvis backend også sender artist_name med.
             Hvis artist_name ikke findes endnu, viser vi "Unknown artist" i stedet for undefined. 
             */
-            moodTrackText.textContent = `${track.track_title} - ${track.artist || "Unknown artist"}`;
+            moodTrackText.textContent = `${track.track_title || "Unknown track"} - ${track.artist || "Unknown artist"}`;
             
             /* opretter vote knap, class="voteBtn", indsætter billede */
             const voteButton = document.createElement("button");
@@ -292,7 +292,7 @@ Formålet er:
 4. At gemme sangen i localStorage
 5. Så myvotes.html senere kan hente og vise sangen
 */
-function addSongToVotes(song) {
+export function addSongToVotes(song) {
   /* Henter session_id fra localStorage.
 
   session_id bliver gemt, når brugeren enten:

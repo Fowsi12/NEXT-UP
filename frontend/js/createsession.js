@@ -1,4 +1,4 @@
-/* JS til */
+/* JS til createsession.html */
 import { showError } from './ui_errorbox.js';
 const errorBox = document.getElementById("errorBox");
 /* errorBox:
@@ -40,9 +40,7 @@ async function createSession(endpoint) {
 
   if (response.ok) {
     const currentSession = await response.json();
-    
-        console.log("Session oprettet:", currentSession);
-        
+
         localStorage.setItem("session_id", currentSession.session_id);
         localStorage.setItem("is_private", currentSession.is_private);
 

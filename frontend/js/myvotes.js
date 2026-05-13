@@ -28,8 +28,9 @@ som brugeren ønsker at stemme på.
 */
 const myVotesList = document.querySelector(".myVotesList");
   /* lastDeletedTrack:
-variabel til historik over slettede sange (til undo funktion) */
-let lastDeletedTrack = null;
+variabel til historik over slettede sange (til undo funktion)
+import { addSongToVotes } from './mainpage.js'; */
+let lastDeletedTrack = [];
   /* DOMContentLoaded:
 Når html er fuldt indlæset og parsed(fortolket), kaldes renderVotes().
 */
@@ -75,8 +76,8 @@ function renderVotes() {
   if (votes.length === 0) {
     const emptyMessage = document.createElement("li");
     emptyMessage.className = "zeroVotesMessage";
-    emptyMessage.textContent = "Du har ikke valgt nogen sange";
-    showError("Du har ikke valgt nogen sange");
+    emptyMessage.textContent = "You have not voted for any tracks";
+    showError("You have not voted for any tracks");
     myVotesList.appendChild(emptyMessage);
     return;
   }
@@ -94,26 +95,26 @@ function renderVotes() {
       /* Opretter et <div>-element til track title og delete knap */
     const trackText = document.createElement("div");
 
-      /* Render tekst med nummerering, sangtitel og artist:
+      /* Render tekst med nummerering, sangtitel og artistnavn:
           Eksempel på resultat:
-          1. Pink + White - Frank Ocean 
+          1. Anaconda - Nicki Minaj 
 
       * `${...}` kaldes en template string.
         Den gør det muligt at blande almindelig tekst og JavaScript-værdier.
 
-      * index + 1:
+      * {index + 1}:
         Viser nummerering i listen og starter fra 1.
         Index starter altid på 0 i JavaScript.
         Derfor bruger vi index + 1, så listen starter ved 1 i stedet for 0.
 
-      * getTrackTitle(Track):
-        Kalder funktion med track objektet som argument og returnerer track_title.
-
-      * getArtistName(Track):
-        Kalder funktion med track objektet som argument og returnerer artist.
+      * track.track_title:
+        Kalder alle sangenes titler fra listen vi har trukket ud af localstorage med funktionen getSessionVotes
+      
+      * track.artist:
+        Kalder alle sangenes artistnavne fra listen på samme måde som track_title.
       */
-    trackText.textContent = `${index + 1}. ${getTrackTitle(track)} - ${getArtistName(track)}`;
-
+    trackText.textContent = `${index + 1}. ${track.track_title} - ${track.artist}`;
+       
       /* Opretter en slet-knap pr. track 
         Knappen tildeles properties: classes og title og vi tilføjer et img-tag i knappen. 
         Knappen tilføjes en event listener "click", som vil kalde funktionen removeTrack. 
@@ -137,31 +138,35 @@ function renderVotes() {
 
 
 
-/* FJERN ÉT TRACK FRA MYVOTES */
+/* SLET ÉT TRACK FRA MY VOTES */
 /* removeTrack(trackId):
 Når brugeren klikker på slet-knappen (class="deleteBtn"), slettes sangen på samme række som knappen.
 track_Id er id'et på den sang, der skal fjernes.
+Vi laver in-place filtrering. 
+Dvs. vi tager et array, kigger på om det id brugeren har klikket på matcher id'er i arrayet, 
+og så tager vi alle de id'er som ikke matcher med i et nyt array, undtagen det id som matcher. 
+Produktet bliver et nyt array undtagen det uønskede element, og det nye array gemmes i den oprindelige variabel.
+
+Hvis et trackId fra votes array'et !== det trackId, som brugeren har trykket slet på, pushes det til det nye array. 
+Hvis et trackId fra votes array'et === det trackId, som brugeren har trykket slet på, hopper vi til næste index. 
+newVotes =[] bliver derfor et array med de sange, der er tilbage, udover den, som brugeren har trykket slet på.
+Vi beholder kun de sange i det nye array, hvor id IKKE matcher trackId.
+
+Den slettede sang pushes til variablen lastDeletedTrack, som hele tiden vokser. 
 */
 function removeTrack(trackId) {
 /* getSessionVotes():
 Kalder funktionen og henter den nuværende liste af valgte sange på MyVotes fra LocalStorage */
   let votes = getSessionVotes();
-/* newVotes =[]:
-Vi laver in-place filtrering: vi tager et array, fjerner et uønsket element og gemmer det nye array i variablen.
-Hvis et trackId fra votes array'et !== det trackId, som brugeren har trykket slet på, pushes det til det nye array. 
-Hvis et trackId fra votes array'et === det trackId, som brugeren har trykket slet på, hopper vi til næste index. 
-newVotes bliver derfor et array med de sange, der er tilbage, udover den, som brugeren har trykket slet på. 
-Vi beholder kun de sange, hvor sangens id IKKE matcher trackId.
-*/
   let newVotes = [];
   let i = 0;
   while (i < votes.length) {
-    if (getTrackId(votes[i]) !== trackId) {
+    const iTrackId = getTrackId(votes[i]);
+    if (iTrackId !== trackId) {
       newVotes.push(votes[i]);
-    }
-    if (getTrackId(votes[i]) === trackId) {
-      lastDeletedTrack = votes[i]
-      console.log("Last deleted track: " + lastDeletedTrack.track_title + " - " + lastDeletedTrack.artist)
+    } else {
+      lastDeletedTrack.push(votes[i]);
+      console.log("Last deleted track:", votes[i].track_title, "-", votes[i].artist);
     }
     i++;
   }
@@ -200,7 +205,7 @@ Hvis der ikke findes nogen gemte votes endnu, returnerer vi en tom liste [].
 function getSessionVotes() {
   const votesKey = getVotesStorageKey();
   return JSON.parse(localStorage.getItem(votesKey)) || [];
-}
+} // TODO: skriv || om til en if else 
 
 
 
@@ -256,7 +261,6 @@ function getCurrentSessionId() {
 }
 
 
-
 /* FIND TRACK_ID */
 /* getTrackId: 
 Funktionen har track som som argument. 
@@ -279,48 +283,10 @@ function getTrackId(track) {
   }
 }
 
-/* getTrackTitle:
-Slår op i track objektet og returnerer track_title.
-Hvis undefined eller null: "Error: Unable to load track title"*/
-function getTrackTitle(track) {
-  if (track.track_title === undefined || track.track_title === null) {
-    return "Unknown track title"
-  } else {
-  return track.track_title
-  }
-}
-
-/* getArtistName:
-Slår op i track objektet og returnerer artist_name. 
-Hvis undefined eller null: "Unable to load artist name"
-*/
-function getArtistName(track) {
-  if (track.artist_name === undefined || track.artist_name === null) {
-    return "Unable to load artist name"
-  } else {
-  return track.artist_name
-  }
-}
 
 
-
-/* 
-Fortryder den sidst valgte sang.
-
-pop() fjerner det sidste element i arrayet.
-Det passer til "undo last vote".
-*/
-function undoLastVote() {
-  const votes = getSessionVotes();
-
-  votes.pop();
-
-  saveSessionVotes(votes);
-  renderVotes();
-}
-
-/* 
-Her sletter vi alle valgte sange for den aktuelle session.
+/* DELETE ALL VOTES */
+/* Her sletter vi alle valgte sange for den aktuelle session.
 
 Vi gemmer bare et tomt array [].
 Så findes sessionen stadig, men vote-listen er tom.
@@ -330,8 +296,23 @@ function deleteAllVotes() {
   renderVotes();
 }
 
-/* 
-Her bekræfter vi votes.
+/* UNDO KNAP */
+/* Fortryder den senest slettede sang, så den tilføjes igen.
+
+pop() fjerner det sidste element i arrayet.
+Det passer til "undo last vote".
+*/
+
+function undoDelete() {
+  const votes = getSessionVotes();
+
+
+  saveSessionVotes(votes);
+  renderVotes();
+}
+
+/* CONFIRM ALL VOTES */
+/* Her bekræfter vi votes.
 
 Lige nu sender funktionen ikke noget til backend endnu.
 Den logger bare session_id og votes i console.
@@ -358,12 +339,12 @@ function confirmVotes() {
 Her har vi valgt at gøre funktionerne tilgængelige globalt.
 
 Det er nødvendigt, fordi myvotes.html bruger onclick direkte i HTML, fx:
-onclick="undoLastVote()"
+onclick="undoDelete()"
 
-Uden window.undoLastVote = undoLastVote ville HTML'en ikke kunne finde funktionen.
+Uden window.undoDelete = undoLastVote ville HTML'en ikke kunne finde funktionen.
 */
 window.removeTrack = removeTrack;
-window.undoLastVote = undoLastVote;
+window.undoDelete = undoDelete;
 window.deleteAllVotes = deleteAllVotes;
 window.confirmVotes = confirmVotes;
 
