@@ -36,7 +36,7 @@ await db.query /*MOODS*/(`
 `);
 await db.query /*SESSIONS*/ (`
   create table sessions (
-    session_id          bigserial      unique not null,
+    session_id          bigserial       unique not null,
     is_private          boolean         not null,
     created_at          timestamp       default current_timestamp
   ) 
@@ -50,13 +50,13 @@ indsætter databasen automatisk tidspunktet til nu */
 await db.query /*USERS*/ (`
   create table users (
     user_id             integer         unique not null,
-    session_id          bigserial      not null references sessions (session_id)
+    session_id          bigserial       not null references sessions (session_id)
   )
 `);
 await db.query /*ALBUMS*/ (`
   create table albums (
-    album_id            integer        unique not null,
-    artist_id           integer        not null references artists (artist_id),
+    album_id            integer         unique not null,
+    artist_id           integer         not null references artists (artist_id),
     release_date        date,
     title               text
   )
@@ -78,14 +78,14 @@ await db.query /*TRACKS_MOODS*/ (`
 `);
 await db.query /*SESSIONS_TRACKS*/ (`
   create table sessions_tracks (
-    session_id          bigserial      not null references sessions (session_id),
+    session_id          bigserial       not null references sessions (session_id),
     track_id            integer         not null references tracks (track_id),
-    added_at            timestamp
+    added_at            timestamp       default current_timestamp
   )
 `);
 await db.query /*VOTES*/ (`
   create table votes (
-    session_id          bigserial      not null references sessions (session_id),
+    session_id          bigserial       not null references sessions (session_id),
     user_id             integer         not null references users (user_id),
     track_id            integer         not null references tracks (track_id)
   )

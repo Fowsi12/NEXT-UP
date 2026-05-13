@@ -24,5 +24,32 @@ nulstiller errorTimeout funktionen hver gang showError funktionen kaldes */
     setTimeout(function() {
       errorBox.style.display = "none"; //skjuler boxen helt igen
     }, 500);
-  }, 3000);
+  }, 4000); //hvor mange ms skal error boksen være synlig
+}
+
+/* MESSAGE BOX SHOW OG FADE UD: 
+Den tager message som parameter
+message vises som text i boxen */
+
+let messageTimeout; 
+export function showMessage(message) {
+  const messageBox = document.getElementById("messageBox");
+
+  clearTimeout(messageTimeout);
+/* clearTimeout:
+nulstiller errorTimeout funktionen hver gang showError funktionen kaldes */
+
+  messageBox.textContent = message;
+  messageBox.style.display = "block";
+
+  setTimeout(function() {
+    messageBox.style.opacity = "1"; //fade ind
+  }, 10);
+
+  messageTimeout = setTimeout(function() {
+    messageBox.style.opacity = "0"; // fade out
+    setTimeout(function() {
+      messageBox.style.display = "none"; //skjuler boxen helt igen
+    }, 500);
+  }, 4000); //hvor mange ms skal error boksen være synlig
 }

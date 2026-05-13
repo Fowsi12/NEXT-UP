@@ -17,7 +17,11 @@ Hvis session_id er 12, gemmes de sange, bruger har stemt på, i LocalStorage und
   Kald blot funktionen showError(""), og boksen vises med tekst i */
 import { showError } from './ui_errorbox.js';
 const errorBox = document.getElementById("errorBox");
-
+  /* MESSAGE BOX: 
+  viser en beskedtekst i en popup box, der forsvinder af sig selv. 
+  Kald blot funktionen showMessage(""), og boksen vises med tekst i */
+import { showMessage } from './ui_errorbox.js';
+const messageBox = document.getElementById("messageBox");
 
 
   /* myVotesList: 
@@ -31,10 +35,15 @@ const myVotesList = document.querySelector(".myVotesList");
 variabel til historik over slettede sange (til undo funktion)
 import { addSongToVotes } from './mainpage.js'; */
 let lastDeletedTrack = [];
+  /*initiallyLoad:
+  variabel til at styre, at showError("") kun viser, at der ikke
+  er tilføjet nogen sange første gang siden vises, og ikke hver gang 
+  der ikke er nogen sange på votes listen (som følge af at brugeren sletter
+  alle sangene på listen) */
+let isInitialLoad = true;
   /* DOMContentLoaded:
-Når html er fuldt indlæset og parsed(fortolket), kaldes renderVotes().
-*/
-document.addEventListener("DOMContentLoaded", renderVotes());
+Når html er fuldt indlæset og parsed(fortolket), kaldes renderVotes() */
+document.addEventListener("DOMContentLoaded", renderVotes);
 
 
 
@@ -77,8 +86,11 @@ function renderVotes() {
     const emptyMessage = document.createElement("li");
     emptyMessage.className = "zeroVotesMessage";
     emptyMessage.textContent = "You have not voted for any tracks";
-    showError("You have not voted for any tracks");
     myVotesList.appendChild(emptyMessage);
+    if (isInitialLoad) {
+      showError("You have not voted for any tracks");
+    }
+    isInitialLoad = false;
     return;
   }
 
@@ -134,6 +146,7 @@ function renderVotes() {
       /* Lægger hele <li> som child ind i parent elementet <ul class="myVotesList"> */
     myVotesList.appendChild(li);
   });
+  isInitialLoad = false;
 }
 
 
@@ -284,40 +297,64 @@ function getTrackId(track) {
 }
 
 
-
+// TODO: deleteAllVotes skal påvirke lastDeletedTrack
 /* DELETE ALL VOTES */
 /* Her sletter vi alle valgte sange for den aktuelle session.
-
+SessionId hentes fra LocalStorage. 
+Votes hentes fra LocalStorage. 
 Vi gemmer bare et tomt array [].
 Så findes sessionen stadig, men vote-listen er tom.
 */
 function deleteAllVotes() {
+  const sessionId = getCurrentSessionId();
+  const votes = getSessionVotes();
+
+  if (votes.length === 0) {
+    showError("No votes to delete! No tracks is present on vote list");
+    return;
+  } else {
+    let i = 0;
+    while (i < votes.length) {
+    lastDeletedTrack.push(votes[i]);
+    i++;
+    }
+  }
   saveSessionVotes([]);
   renderVotes();
 }
 
 /* UNDO KNAP */
-/* Fortryder den senest slettede sang, så den tilføjes igen.
+/* undoDeleete():
+  Fortryder den senest slettede sang, så den tilføjes til votes igen.
+  Vi viser en fejl, hvis der ikke er slettet nogen tracks endnu. 
 
-pop() fjerner det sidste element i arrayet.
-Det passer til "undo last vote".
-*/
-
+  * lastDeletedTrack[lastDeletedTrack.length - 1] henter det sidst slettede track
+  * pop() fjerner det fra historikken
+  * votes.push(restoredTrack) tilføjer det tilbage til listen
+  * saveSessionVotes(votes) gemmer ændringen
+  * renderVotes() opdaterer UI
+  */
 function undoDelete() {
+  if (lastDeletedTrack.length === 0) {
+    showError("Nothing to undo! No tracks has been deleted from vote list");
+    return;
+  }
   const votes = getSessionVotes();
-
-
+  const restoredTrack = lastDeletedTrack[lastDeletedTrack.length - 1]
+  lastDeletedTrack.pop();
+  votes.push(restoredTrack);
   saveSessionVotes(votes);
   renderVotes();
 }
 
 /* CONFIRM ALL VOTES */
-/* Her bekræfter vi votes.
+/* confirmVotes():
+Bekræfter alle votes på listen.
 
+TODO: 
 Lige nu sender funktionen ikke noget til backend endnu.
 Den logger bare session_id og votes i console.
-
-Senere kan denne funktion udvides til at sende votes til server.js,
+Senere kan denne funktion udvides til at sende votes til server.js, 
 så de kan gemmes i databasen.
 */
 function confirmVotes() {
@@ -325,14 +362,15 @@ function confirmVotes() {
   const votes = getSessionVotes();
 
   if (votes.length === 0) {
-    alert("Du har ikke valgt nogen sange endnu.");
+    showError("No votes to confirm! No tracks is present on vote list");
     return;
   }
 
-  console.log("Bekræftede votes for session:", sessionId);
+  console.log("Confirmed votes for session:", sessionId);
   console.log(votes);
-
-  alert("Dine votes er bekræftet.");
+  showMessage("Votes confirmed! Tracks added to TrackFlow")
+  saveSessionVotes([]);
+  renderVotes();
 }
 
 /* 

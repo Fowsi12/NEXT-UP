@@ -18,6 +18,9 @@ server.post('/api/sessions/shared', onCreateSharedSession);
 server.get('/api/moods', onGetStartMoods); /* henter moods til mainpage */
 server.get('/api/moods/tracks', onGetMoodTracks)/* henter sange til moods */
 
+server.post("/api/sessions/:sessionId/queue", onAddTracksToQueue); /* Tilføjer sange til queue i sessionen */
+server.get("/api/sessions/:sessionId/queue", onGetSessionQueue); /* Henter alle sange i queue for en bestemt session.  */
+
 server.listen(port, onServerReady);
 
 /* JOIN SESSION
@@ -25,11 +28,10 @@ Tager session_id fra frontend, søger efter sessionen i databasen
 og sender enten sessionen tilbage eller en fejlbesked.
 */
 async function onJoinSession(request, response) {
-  const sessionId = Number(request.body.session_id);
+  const sessionId = parseInt(request.body.session_id);
 
   if (!sessionId) {
     return response.status(400).json({
-      success: false,
       message: "Session ID is missing in database or is invalid",
     });
   }
@@ -46,13 +48,11 @@ async function onJoinSession(request, response) {
 
   if (dbResult.rows.length === 0) {
     return response.status(404).json({
-      success: false,
       message: "Session was not found",
     });
   }
 
   response.json({
-    success: true,
     message: "Session found",
     session: dbResult.rows[0],
   });
@@ -111,6 +111,182 @@ async function onGetMoodTracks(request, response) {
     join    tracks on tracks_moods.track_id = tracks.track_id
     join    artists on tracks.artist_id = artists.artist_id
   `);
+  response.json(dbResult.rows);
+}
+
+
+/* ADD TRACKS TO QUEUE / TRACKFLOW
+Denne backend-funktion bliver kaldt, når brugeren trykker "Confirm votes" på myvotes.html.
+Formålet er:
+1. Frontend sender en liste af valgte sange til serveren
+2. Serveren finder den session, brugeren er i
+3. Serveren gemmer sangene i databasen i tabellen sessions_tracks
+4. Tabellen sessions_tracks fungerer som den fælles afspilningskø (TrackFlow)
+*/
+async function onAddTracksToQueue(request, response) {
+  /* 
+  sessionId hentes fra URL'en. 
+  Hvis frontend kalder "POST /api/sessions/12/queue"
+  Så er: request.params.sessionId = "12"
+
+  request.params er altid string. 
+  Vi bruger parseInt() for at lave string "12" om til tallet 12.
+  */
+  const sessionId = parseInt(request.params.sessionId);
+  /* 
+  tracks hentes fra request body. Body er HTTP payloaden der kommer fra klienten. 
+  Vi skal kun bruge track_id til databasen, 
+  fordi track_title og artist allerede findes i tracks/artists-tabellerne.
+  */
+  const tracks = request.body.tracks;
+  /* 
+  Hvis sessionId mangler eller ikke kan laves til et gyldigt tal,
+  stopper vi funktionen og sender en fejl tilbage til frontend.
+  !sessionId svarer til undefined, Null eller 0. */
+  if (!sessionId) {
+    return response.status(400).json({
+      message: "Session ID is missing or is invalid",
+    });
+  }
+
+  /* if (!tracks):
+  Her tjekker vi, om track faktisk har indhold og om array er tomt.
+  Koden betyder: Hvis tracks ikke er en liste ELLER hvis listen er tom, så stop funktionen
+  */
+  if (!tracks || tracks.length === 0) {
+    return response.status(400).json({
+      message: "No tracks sent to TrackFlow",
+    });
+  }
+
+  /* insertedTracks: 
+  bruges til at gemme de rækker, 
+  der faktisk bliver indsat i databasen.
+  Den bruges til sidst, så frontend kan modtage,
+  hvilke tracks der blev tilføjet til queue.
+  */
+  const insertedTracks = [];
+
+  /* tracks.forEach():
+  Vi kører koden for hvert index i tracks, som frontend har sendt.
+  */
+  for (const tracks of tracks) { // Vi er nødt til at bruge for-of loop, når vi har en await db query indeni
+    /* trackId:
+    Vi finder trackId for den aktuelle sang.
+    Vi bruger defensive programming i tilfælde af fejl i data, hvor
+    nogle objekter måske indeholder "track.track_id" og andre "track.id".
+    Brug track.track_id hvis den findes. Ellers brug track.id.
+
+    parseInt() laver string om til et tal, fordi databasen forventer et integer track_id.
+    */
+    const trackId = parseInt(track.track_id || track.id);
+    /* if (!trackId):
+    Hvis trackId ikke findes eller ikke er gyldigt, springer vi denne sang over.
+    Vi bruger continue for at springe til næste index i listen. */
+    if (!trackId) {
+      continue;
+    }
+    /* existingTrack:
+    Vi undersøger om sangen allerede findes i queue for denne session.
+    Det gør vi for at undgå duplicates.
+    Eksempel:
+    Hvis session 12 allerede har track.track_id: 4 i sessions_tracks, skal vi ikke indsætte track 4 igen.
+    */
+    const existingTrack = await db.query(`
+      select  session_id,
+                track_id
+      from    sessions_tracks
+      where   session_id = $1
+      and     track_id = $2
+    `,
+      [sessionId, trackId]
+    );
+    /* if (existingTrack.rows.length === 0):
+    Det er listen af resultater fra SELECT-queryen.
+    Hvis length === 0, betyder det:
+    Databasen fandt ingen række med denne session_id og track_id.
+    Og så må track gerne indsættes på sangkøen (TrackFlow)
+    */
+    if (existingTrack.rows.length === 0) {
+      /* track indsættes i sessions_tracks:
+      sessions_tracks er vores sangkø-tabel.
+      Vi gemmer:
+      - session_id: hvilken session køen hører til
+      - track_id: hvilken sang der er tilføjet
+      Mens added_at udfyldes automatisk ifølge vores createDb.js default constraints
+
+      returning *: Databasen returnerer den række, der lige er blevet indsat.
+      */
+      const dbResult = await db.query(`
+        insert into sessions_tracks (session_id, track_id)
+        values ($1, $2)
+        returning *
+      `,
+        [sessionId, trackId]
+      );
+      /* insertedTracks.push:
+      dbResult.rows[0] er den række, der lige blev indsat.
+      Den gemmer vi i insertedTracks-arrayet,
+      så vi til sidst kan sende den tilbage til frontend.
+      */
+      insertedTracks.push(dbResult.rows[0]);
+    }
+  }
+  /* Svar sendes til frontend:
+  For-of loopet er færdigt, sender vi et svar til frontend.
+  
+  status(201):
+  201 betyder "Created" (Der er oprettet nye rækker i databasen).
+
+  insertedTracks: liste med tracks, som er indsat. 
+  */
+  response.status(201).json({
+    message: "Tracks added to the TrackFlow song queue",
+    insertedTracks: insertedTracks,
+  });
+}
+
+
+/* GET SESSION QUEUE:
+Denne funktion henter alle sange i queue for en bestemt session.
+
+Vi joiner:
+sessions_tracks -> tracks -> artists
+
+Så frontend får:
+- session_id
+- track_id
+- track_title
+- artist
+- added_at
+*/
+async function onGetSessionQueue(request, response) {
+  const sessionId = parseInt(request.params.sessionId);
+
+  if (!sessionId) {
+    return response.status(400).json({
+      message: "Session ID mangler eller er ugyldigt.",
+    });
+  }
+
+  const dbResult = await db.query(
+    `
+    select  sessions_tracks.session_id,
+            tracks.track_id,
+            tracks.title as track_title,
+            artists.stage_name as artist,
+            sessions_tracks.added_at
+    from    sessions_tracks
+    join    tracks
+      on    sessions_tracks.track_id = tracks.track_id
+    join    artists
+      on    tracks.artist_id = artists.artist_id
+    where   sessions_tracks.session_id = $1
+    order by sessions_tracks.added_at asc
+    `,
+    [sessionId]
+  );
+
   response.json(dbResult.rows);
 }
 

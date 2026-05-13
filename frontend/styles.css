@@ -45,7 +45,7 @@ id="errorBox
 */
 #errorBox {
   position: fixed;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%); /* centreres midt på siden */
   z-index: 99;
@@ -55,6 +55,26 @@ id="errorBox
   font-weight: bold;
   font-size: 20px;
   background-color: crimson;
+  padding: 10px 20px;
+  border-radius: 8px;
+  
+  opacity: 0; /* starter synlig */
+  transition: opacity 0.5s ease;
+  display: none; /* skjult som default */
+  pointer-events: none; /* så den ikke blokerer klik */
+}
+#messageBox {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* centreres midt på siden */
+  z-index: 99;
+
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  background-color: green;
   padding: 10px 20px;
   border-radius: 8px;
   
