@@ -216,37 +216,9 @@ async function onAddTracksToQueue(request, response) {
       if (!trackId) {
         return null;
       }
-      /* existingTrack:
-      Vi undersøger om sangen allerede findes i queue for denne session.
-      Det gør vi for at undgå duplicates.
-      Eksempel:
-      Hvis session 12 allerede har track.track_id: 4 i sessions_tracks, skal vi ikke indsætte track_id: 4 igen.
-      */
-      const existingTrack = await db.query(`
-        select  session_id,
-                track_id
-        from    sessions_tracks
-        where   session_id = $1
-        and     track_id = $2
-      `,
-        [sessionId, trackId]
-      );
-      /* if (existingTrack.rows.length === 0):
-      Det er listen af resultater fra SELECT-queryen.
-      Hvis length === 0, betyder det:
-      Databasen fandt ingen række med denne session_id og track_id.
-      Og så må track gerne indsættes på sangkøen (TrackFlow)
-      */
-      if (existingTrack.rows.length === 0) {
-        /* track indsættes i sessions_tracks:
-        sessions_tracks er vores sangkø-tabel.
-        Vi gemmer:
-        - session_id: hvilken session køen hører til
-        - track_id: hvilken sang der er tilføjet
-        Mens added_at udfyldes automatisk ifølge vores createDb.js default constraints
-
-        returning *: Databasen returnerer den række, der lige er blevet indsat.
-        */
+      /*
+      Vi indsætter tracks hver gang brugeren trykker confirm.
+      Eksempel: Hvis 3 brugere stemmer på track_id 8 i samme session, får vi 3 rækker i sessions_tracks med samme session_id og track_id. */
         const dbResult = await db.query(`
           insert into sessions_tracks (session_id, track_id)
           values ($1, $2)
@@ -257,10 +229,6 @@ async function onAddTracksToQueue(request, response) {
         /* 
         Returnerer det indsatte track */
         return dbResult.rows[0];
-      }
-      /* Hvis track allerede findes, return null*/
-      // TODO: Tilføj vote i votes.csv
-      return null;
     })
   );
   /* inserterdTracks kan nu indeholde et mix af tracks og null værdier. 
@@ -308,21 +276,28 @@ async function onGetSessionQueue(request, response) {
     });
   }
 
-  const dbResult = await db.query(
-    `
-    select    sessions_tracks.session_id,
-              tracks.track_id,
-              tracks.title as track_title,
-              artists.stage_name as artist,
-              sessions_tracks.added_at
-    from      sessions_tracks
-    join      tracks
-      on      sessions_tracks.track_id = tracks.track_id
-    join      artists
-      on      tracks.artist_id = artists.artist_id
-    where     sessions_tracks.session_id = $1
-    order by  sessions_tracks.added_at asc
-    `,
+  const dbResult = await db.query(`
+  select    sessions_tracks.session_id,
+            tracks.track_id,
+            tracks.title as track_title,
+            artists.stage_name as artist,
+
+            count(sessions_tracks.track_id) as vote_count,
+
+            min(sessions_tracks.added_at) as first_added_at
+  from      sessions_tracks
+  join      tracks
+    on      sessions_tracks.track_id = tracks.track_id
+  join      artists
+    on      tracks.artist_id = artists.artist_id
+  where     sessions_tracks.session_id = $1
+  group by  sessions_tracks.session_id,
+            tracks.track_id,
+            tracks.title,
+            artists.stage_name
+  order by  vote_count desc,
+            first_added_at asc
+  `,
     [sessionId]
   );
 

@@ -12,6 +12,7 @@ const errorBox = document.getElementById("errorBox");
 /* addSongToVotes funktion fra ./mainpage, så vi kan bruge samme funktion til vote button */
 import { addSongToVotes } from "./mainpage.js";
 
+
 /* SHOW/HIDE BUTTON TIL TRACKFLOW QUEUE */
 const trackFlowBox = document.querySelector(".trackFlowBox")
 const queueBtn = document.querySelector(".songQueueBtn");
@@ -59,8 +60,8 @@ async function renderQueue() {
 /* for hver track indlæst, render vi en række med tekst og vote knap */
   queue.forEach(function(track, index) {
     const li = document.createElement("li");
-          li.className = "trackFlow";
-          li.textContent = `${index + 1}. ${track.track_title} - ${track.artist}`;
+          li.className = "trackFlowRow";
+          li.textContent = `${index + 1}. ${track.track_title} - ${track.artist} - (${track.vote_count} votes) `;
     const voteButton = document.createElement("button");
           voteButton.className = "voteBtn CircleBtn";
           voteButton.innerHTML = `<img src="images/vote_button.png" class="centerBtnImg">`;

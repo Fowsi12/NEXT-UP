@@ -185,6 +185,13 @@ venter 500 ms inden boxen bliver helt skjult igen,
 fordi den har style="transition: opacity 0.5s"*/
 }
 
+/* GO TO MY VOTES BUTTON */
+const goToMyVotesButtons = document.querySelectorAll(".myVotesButton")
+goToMyVotesButtons.forEach(function(button) {
+    button.addEventListener("click", function() {
+        window.location.href = "myvotes.html";
+    });
+});
 
 /* Funktion til at filtrerer sange fra allTracks efter mood: 
 Funktionen returner via et opslag på mood i den track parameter vi giver den

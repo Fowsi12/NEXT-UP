@@ -87,7 +87,7 @@ await db.query /*VOTES*/ (`
   create table votes (
     session_id          bigserial       not null references sessions (session_id),
     user_id             integer         not null references users (user_id),
-    track_id            integer         not null references tracks (track_id)
+    track_id            integer         not null references tracks (track_id),
   )
 `);
 

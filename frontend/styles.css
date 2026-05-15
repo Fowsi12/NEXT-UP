@@ -130,10 +130,13 @@ id="errorBox
 .closeMoodBox:hover {
   background-color: rgb(255, 63, 63);
 }
+.aboveMoodTrackList {
+ display: flex;
+ justify-content: flex-end; /* sætter knappperne ud mod højre */
+ gap: 10px;
+ margin-bottom: 20px;
+}
 .refreshTracks {
-  position: relative;
-  margin-bottom: 20px;
-  left: 95%;
   width: 40px;
   height: 40px;
   z-index: 11;
@@ -143,6 +146,36 @@ id="errorBox
 .refreshTracks:hover {
   background-color: rgb(190, 5, 206);
 }
+.myVotesButton {
+  display: flex; 
+  /* display: flex 
+  dislay = hvilken retning children elementer skal liggge i. 
+  display: flex = elementets children kan styres flexibelt med vandret/lodret retning, centrering, spacing mellem children m.m. */
+  align-items: center; 
+  /* align-items:
+  med standard flex-direction (row/rækker) styrer det vertikal placering.
+  align-items: center = children elementer centreres lodret inde i denne parent */
+  justify-content: center;
+  /* justify-content: 
+  med standard flex-direction (row/rækker) styrer dette vandret placering */
+  border-radius: 20px;
+  border: none;
+  flex-direction: row;
+  width: 100px;
+  height: 40px;
+  z-index: 11;
+  cursor: pointer;
+  background-color: rgb(100, 2, 109);
+  color: white;
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal; 
+  font-size: 20px;
+}
+.myVotesButton:hover {
+  background-color: rgb(190, 5, 206);
+}
+
 /* VOTE BUTTON I MOOD POPUP BOXES */
 .voteBtn {
     width: 40px;
@@ -195,7 +228,7 @@ id="errorBox
   color: white;
   border: none;
   padding: 12px 18px;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
   border-radius: 8px;
   user-select: none;
@@ -228,7 +261,7 @@ id="errorBox
   padding: 14px 18px;
   text-decoration: none;
   display: block;
-  font-size: 15px;
+  font-size: 16px;
 }
 /* Hover på menufelterne */
 .menu-content a:hover {
@@ -457,3 +490,4 @@ transform: translateX(0); /* Når klassen "open" tilføjes, flyttes den ind på 
 .trackFlowBox h3 {
   text-align: center;
 }
+
