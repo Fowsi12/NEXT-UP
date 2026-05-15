@@ -165,72 +165,113 @@ async function onAddTracksToQueue(request, response) {
   Den bruges til sidst, så frontend kan modtage,
   hvilke tracks der blev tilføjet til queue.
   */
-  const insertedTracks = [];
+  const insertedTracks = await Promise.all(
 
-  /* tracks.forEach():
-  Vi kører koden for hvert index i tracks, som frontend har sendt.
+  /* VALG AF METODE TIL AT KØRE QUERIES?: 
+  for...of: 
+  Queries køres færdige en ad gangen. Sekventielt. 
+  Vent på første query. Så næste. Så næste. 
+  Vores database insert afhænger af vores select på existingTrack (tracks der allerede findes i køen)
+  for...of er god når:
+  * rækkefølge er vigtig
+  * inserts afhænger af hinanden
+  * undgå overload
+  * stoppe ved evt. fejl
+
+  Promise.all: 
+  Det starter alle queries samtidig. Parallelt. 
+  Promise.all venter så på, at alle queries er kørt færdige. 
+  Promise.all er gåd når:
+  * ting er uafhængige
+  * man ønsker hastighed
+  * rækkefølgen er ligegyldig
+  * ønsker at indsætte mange uafhængige rows
+
+  forEach(): 
+  Vi kan ikke bruge forEach, fordi forEach venter ikke på await queries. 
+  Det betyder, at serveren kan sende et samlet response til frontend, 
+  FØR alle queries er færdige... 
+  Dvs. vi risikerer, at den ikke når at finde hvilke tracks, der er i køen, 
+  Inden vi indsætter tracks i køen. Og så går hele idéen i vasken. 
   */
-  for (const tracks of tracks) { // Vi er nødt til at bruge for-of loop, når vi har en await db query indeni
-    /* trackId:
-    Vi finder trackId for den aktuelle sang.
-    Vi bruger defensive programming i tilfælde af fejl i data, hvor
-    nogle objekter måske indeholder "track.track_id" og andre "track.id".
-    Brug track.track_id hvis den findes. Ellers brug track.id.
+ 
+    /* map():
+    map laver et nyt array.
+    Her laver vi et array af promises, som Promise.all kan vente på.
+    */
+    tracks.map(async function(track) { 
+      /* trackId:
+      Vi finder trackId for den aktuelle sang.
+      Vi bruger defensive programming i tilfælde af fejl i data, hvor
+      nogle objekter måske indeholder "track.track_id" og andre "track.id".
+      Brug track.track_id hvis den findes. Ellers brug track.id.
 
-    parseInt() laver string om til et tal, fordi databasen forventer et integer track_id.
-    */
-    const trackId = parseInt(track.track_id || track.id);
-    /* if (!trackId):
-    Hvis trackId ikke findes eller ikke er gyldigt, springer vi denne sang over.
-    Vi bruger continue for at springe til næste index i listen. */
-    if (!trackId) {
-      continue;
-    }
-    /* existingTrack:
-    Vi undersøger om sangen allerede findes i queue for denne session.
-    Det gør vi for at undgå duplicates.
-    Eksempel:
-    Hvis session 12 allerede har track.track_id: 4 i sessions_tracks, skal vi ikke indsætte track 4 igen.
-    */
-    const existingTrack = await db.query(`
-      select  session_id,
-                track_id
-      from    sessions_tracks
-      where   session_id = $1
-      and     track_id = $2
-    `,
-      [sessionId, trackId]
-    );
-    /* if (existingTrack.rows.length === 0):
-    Det er listen af resultater fra SELECT-queryen.
-    Hvis length === 0, betyder det:
-    Databasen fandt ingen række med denne session_id og track_id.
-    Og så må track gerne indsættes på sangkøen (TrackFlow)
-    */
-    if (existingTrack.rows.length === 0) {
-      /* track indsættes i sessions_tracks:
-      sessions_tracks er vores sangkø-tabel.
-      Vi gemmer:
-      - session_id: hvilken session køen hører til
-      - track_id: hvilken sang der er tilføjet
-      Mens added_at udfyldes automatisk ifølge vores createDb.js default constraints
-
-      returning *: Databasen returnerer den række, der lige er blevet indsat.
+      parseInt() laver string om til et tal, fordi databasen forventer et integer track_id.
       */
-      const dbResult = await db.query(`
-        insert into sessions_tracks (session_id, track_id)
-        values ($1, $2)
-        returning *
+      const trackId = parseInt(track.track_id || track.id);
+      /* if (!trackId):
+      Hvis trackId ikke findes, leveres null, 
+      men dette vil ikke være et problem før i fremtid fx hvis man tilføjer en sang uden et track.id.
+      Lige nu har alle vores sange et track.id, men defensiv programmering skader ingen ;)  */
+      if (!trackId) {
+        return null;
+      }
+      /* existingTrack:
+      Vi undersøger om sangen allerede findes i queue for denne session.
+      Det gør vi for at undgå duplicates.
+      Eksempel:
+      Hvis session 12 allerede har track.track_id: 4 i sessions_tracks, skal vi ikke indsætte track_id: 4 igen.
+      */
+      const existingTrack = await db.query(`
+        select  session_id,
+                track_id
+        from    sessions_tracks
+        where   session_id = $1
+        and     track_id = $2
       `,
         [sessionId, trackId]
       );
-      /* insertedTracks.push:
-      dbResult.rows[0] er den række, der lige blev indsat.
-      Den gemmer vi i insertedTracks-arrayet,
-      så vi til sidst kan sende den tilbage til frontend.
+      /* if (existingTrack.rows.length === 0):
+      Det er listen af resultater fra SELECT-queryen.
+      Hvis length === 0, betyder det:
+      Databasen fandt ingen række med denne session_id og track_id.
+      Og så må track gerne indsættes på sangkøen (TrackFlow)
       */
-      insertedTracks.push(dbResult.rows[0]);
+      if (existingTrack.rows.length === 0) {
+        /* track indsættes i sessions_tracks:
+        sessions_tracks er vores sangkø-tabel.
+        Vi gemmer:
+        - session_id: hvilken session køen hører til
+        - track_id: hvilken sang der er tilføjet
+        Mens added_at udfyldes automatisk ifølge vores createDb.js default constraints
+
+        returning *: Databasen returnerer den række, der lige er blevet indsat.
+        */
+        const dbResult = await db.query(`
+          insert into sessions_tracks (session_id, track_id)
+          values ($1, $2)
+          returning *
+        `,
+          [sessionId, trackId]
+        );
+        /* 
+        Returnerer det indsatte track */
+        return dbResult.rows[0];
+      }
+      /* Hvis track allerede findes, return null*/
+      // TODO: Tilføj vote i votes.csv
+      return null;
+    })
+  );
+  /* inserterdTracks kan nu indeholde et mix af tracks og null værdier. 
+  Vi filtrerer null væk */
+  const filteredTracks = [];
+  let i = 0; 
+  while (i < insertedTracks.length) {
+    if (insertedTracks[i] !== null) {
+      filteredTracks.push(insertedTracks[i]);
     }
+    i++;
   }
   /* Svar sendes til frontend:
   For-of loopet er færdigt, sender vi et svar til frontend.
@@ -242,17 +283,15 @@ async function onAddTracksToQueue(request, response) {
   */
   response.status(201).json({
     message: "Tracks added to the TrackFlow song queue",
-    insertedTracks: insertedTracks,
+    insertedTracks: filteredTracks,
   });
 }
 
 
 /* GET SESSION QUEUE:
 Denne funktion henter alle sange i queue for en bestemt session.
-
-Vi joiner:
-sessions_tracks -> tracks -> artists
-
+Vi får session_id fra frontend. 
+Vi joiner: sessions_tracks -> tracks -> artists
 Så frontend får:
 - session_id
 - track_id
@@ -271,18 +310,18 @@ async function onGetSessionQueue(request, response) {
 
   const dbResult = await db.query(
     `
-    select  sessions_tracks.session_id,
-            tracks.track_id,
-            tracks.title as track_title,
-            artists.stage_name as artist,
-            sessions_tracks.added_at
-    from    sessions_tracks
-    join    tracks
-      on    sessions_tracks.track_id = tracks.track_id
-    join    artists
-      on    tracks.artist_id = artists.artist_id
-    where   sessions_tracks.session_id = $1
-    order by sessions_tracks.added_at asc
+    select    sessions_tracks.session_id,
+              tracks.track_id,
+              tracks.title as track_title,
+              artists.stage_name as artist,
+              sessions_tracks.added_at
+    from      sessions_tracks
+    join      tracks
+      on      sessions_tracks.track_id = tracks.track_id
+    join      artists
+      on      tracks.artist_id = artists.artist_id
+    where     sessions_tracks.session_id = $1
+    order by  sessions_tracks.added_at asc
     `,
     [sessionId]
   );

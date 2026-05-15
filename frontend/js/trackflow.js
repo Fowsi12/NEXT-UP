@@ -1,0 +1,104 @@
+/* TRACK FLOW = AFSPILNINGSKØEN
+Håndterer alt der har med queue at gøre, 
+både at hente den fra databasen og at vise den i mainpage menuen 
+*/
+
+/* ERROR BOX: 
+viser fejltekst i en popup box der forsvinder af sig selv
+Kald blot funktionen showError("") og boksen vises med tekst i */
+import { showError } from './ui_errorbox.js';
+const errorBox = document.getElementById("errorBox");
+
+/* addSongToVotes funktion fra ./mainpage, så vi kan bruge samme funktion til vote button */
+import { addSongToVotes } from "./mainpage.js";
+
+/* SHOW/HIDE BUTTON TIL TRACKFLOW QUEUE */
+const trackFlowBox = document.querySelector(".trackFlowBox")
+const queueBtn = document.querySelector(".songQueueBtn");
+const queueBtnIconOpenClose = document.querySelector(".songQueueIconOpenClose")
+const queueBtnIcon = document.querySelector(".songQueueIcon")
+queueBtn.addEventListener("click", async function () {
+  if (trackFlowBox.classList.contains("open")) {
+    trackFlowBox.classList.remove("open");
+    queueBtnIconOpenClose.src = "images/arrow_left_menu.png";
+    queueBtnIconOpenClose.style = "right: 22px";
+    queueBtnIcon.style = "right: 2px";
+  } else {
+    await renderQueue();
+
+    trackFlowBox.classList.add("open");
+    queueBtnIconOpenClose.src = "images/arrow_right_menu.png";
+    queueBtnIconOpenClose.style = "right: -4px";
+    queueBtnIcon.style = "right: 16px";
+  }
+/* man kunne også bruge ".toggle" her: 
+".toggle" tilføjer klassen hvis den ikke findes og fjerner den, hvis den findes*/
+});
+
+
+/* Viser queue-listen i mainpage - TrackFlow-boxen */
+async function renderQueue() {
+  const trackFlowList = document.getElementById("trackFlowList");
+
+  if (!trackFlowList) {
+    return;
+  }
+
+  const queue = await getSessionQueue();
+
+  trackFlowList.innerHTML = "";
+
+  /* hvis sesion queue er tom, vises en besked */
+  if (queue.length === 0) {
+    const emptyMessage = document.createElement("li");
+    emptyMessage.className = "trackFlow";
+    emptyMessage.textContent = "Flows has yet to be shared...";
+    trackFlowList.appendChild(emptyMessage);
+    return;
+  }
+/* for hver track indlæst, render vi en række med tekst og vote knap */
+  queue.forEach(function(track, index) {
+    const li = document.createElement("li");
+          li.className = "trackFlow";
+          li.textContent = `${index + 1}. ${track.track_title} - ${track.artist}`;
+    const voteButton = document.createElement("button");
+          voteButton.className = "voteBtn CircleBtn";
+          voteButton.innerHTML = `<img src="images/vote_button.png" class="centerBtnImg">`;
+          voteButton.addEventListener("click", function() {
+            addSongToVotes(track);
+          });
+    li.appendChild(voteButton);
+    trackFlowList.appendChild(li);
+  });
+}
+
+
+document.addEventListener("DOMContentLoaded", renderQueue);
+/* Henter queue-listen fra databasen til vores TrackFlow box */
+async function getSessionQueue() {
+  const sessionId = getCurrentSessionId();
+  if (!sessionId) {
+    console.log("No session_id found. Cannot load queue.");
+    return [];
+    showError("No session ID found. Cannot load content for TrackFlow.");
+  }
+  const response = await fetch(`/api/sessions/${sessionId}/queue`);
+  if (!response.ok) {
+    console.log("Could not fetch queue from database.");
+    return [];
+  }
+  const trackFlow = await response.json();
+  console.log("loaded tracks for current seession id", currentSessionId, "--- tracks:", trackFlow);
+  return trackFlow;
+}
+
+let currentSessionId
+/* Finder den session brugeren er i via localStorage */
+function getCurrentSessionId() {
+  currentSessionId = localStorage.getItem("session_id");
+  return currentSessionId;
+}
+
+
+
+

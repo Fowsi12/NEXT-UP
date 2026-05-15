@@ -431,7 +431,7 @@ id="errorBox
 .songQueueBtn:hover {
   background: rgb(190, 5, 206)
 }
-.queueBox {
+.trackFlowBox {
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -451,9 +451,9 @@ id="errorBox
   transform: translateX(100%); /* Starter udenfor skærmen til højre */
   transition: transform 0.5s ease;
 }
-.queueBox.open {
+.trackFlowBox.open {
 transform: translateX(0); /* Når klassen "open" tilføjes, flyttes den ind på skærmen */
 }
-.queueBox h3 {
+.trackFlowBox h3 {
   text-align: center;
 }

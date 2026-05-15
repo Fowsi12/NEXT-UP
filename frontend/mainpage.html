@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="db/connect.js"></script>
     <script src="js/endpoint-user.js"></script>
-    <script src="js/queue.js" defer></script>
+    <script src="js/trackflow.js" defer type="module"></script>
     <script src="js/mainpage.js" defer type="module"></script>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -116,15 +116,13 @@
       </button>
     </div>
     <!--SONG QUEUE MENU-->
-    <div id="queueMenu" class="queueBox">
+    <div id="trackFlowBox" class="trackFlowBox">
       <h3>Track Flow</h3>
 
-      <!-- Her indsætter queue.js de confirmed sange -->
-      <ul id="queueList" class="queueList"></ul>
+      <!-- Her indsætter trackFlow.js de confirmed sange -->
+      <ul id="trackFlowList" class="trackFlowList"></ul>
     </div>
 
-
-    <div id="tracks"></div>
 
       <!--Tom div til fejlmeddelelser. Lad den ligge nederst-->
     <div id="errorBox"></div>

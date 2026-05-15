@@ -26,7 +26,13 @@ let allTracks = []; /* variabel til alle tracks */
 /* HENT ALLE TRACKS & MOODS FRA DB */
 document.addEventListener("DOMContentLoaded", loadTracks);
 async function loadTracks() {
-    const response = await fetch('/api/moods/tracks');/*henter tracks fra backend api*/    
+    const response = await fetch('/api/moods/tracks');
+    /* await fetch:
+    henter tracks fra backend via api
+    await fetch giver ikke data med det samme. 
+    Den returnerer et promise ("jeg er gået i gang med HTTP request, resultatet kommmer senere")
+    Await fortæller at funktionen stopper indtil der kommer svar. 
+    Men browseren kan stadig køre andre events*/
     console.log("Response:" + response.status);
     if (response.ok) {
         allTracks = await response.json();
@@ -378,27 +384,3 @@ export function addSongToVotes(song) {
   /* Logger hele vote-listen for den aktuelle session */
   console.log("Votes for session:", votes);
 }
-
-
-
-/* SONG QUEUE */
-/* knap til show/hide song queue */
-const queueBox = document.querySelector(".queueBox")
-const queueBtn = document.querySelector(".songQueueBtn");
-const queueBtnIconOpenClose = document.querySelector(".songQueueIconOpenClose")
-const queueBtnIcon = document.querySelector(".songQueueIcon")
-queueBtn.addEventListener("click", function () {
-  if (queueBox.classList.contains("open")) {
-    queueBox.classList.remove("open");
-    queueBtnIconOpenClose.src="images/arrow_left_menu.png";
-    queueBtnIconOpenClose.style="right: 22px";
-    queueBtnIcon.style="right: 2px";
-  } else {
-    queueBox.classList.add("open");
-    queueBtnIconOpenClose.src="images/arrow_right_menu.png";
-    queueBtnIconOpenClose.style="right: -4px";
-    queueBtnIcon.style="right: 16px";
-  } 
-/* man kunne også bruge ".toggle" her: 
-".toggle" tilføjer klassen hvis den ikke findes og fjerner den, hvis den findes*/
-});

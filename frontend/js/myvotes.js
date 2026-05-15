@@ -357,7 +357,7 @@ Den logger bare session_id og votes i console.
 Senere kan denne funktion udvides til at sende votes til server.js, 
 så de kan gemmes i databasen.
 */
-function confirmVotes() {
+async function confirmVotes() {
   const sessionId = getCurrentSessionId();
   const votes = getSessionVotes();
 
@@ -365,14 +365,48 @@ function confirmVotes() {
     showError("No votes to confirm! No tracks is present on vote list");
     return;
   }
+  const response = await fetch(`/api/sessions/${sessionId}/queue`, {
+  /* await fetch:
+    Den returnerer et promise ("jeg er gået i gang med HTTP request, resultatet kommmer senere")
+    Await fortæller at funktionen stopper indtil der kommer svar. 
+    Men browseren kan stadig køre andre events*/
+    method: "POST",
+    /* headers: 
+    fortæller backend, hvad vi sender. 
+    her fortæller vi, at vi sender JSON */
+    headers: {
+      "Content-Type": "application/json"
+    },
+    /* body: JSON.stringify:
+    tag JS objektet og lav det om til tekst, så det kan sendes via HTTP.
+    Hvis ikke vi gør det, så kan vores backend server.js ikke udføre request.body.tracks;
+    */
+    body: JSON.stringify({
+      tracks: votes
+    })
+  });
 
-  console.log("Confirmed votes for session:", sessionId);
-  console.log(votes);
-  showMessage("Votes confirmed! Tracks added to TrackFlow")
-  saveSessionVotes([]);
-  renderVotes();
+    console.log("Response:" + response.status);
+    if (response.ok) {
+    console.log("Confirmed votes for session:", sessionId);
+    console.log(votes);
+    saveSessionVotes([]);
+    renderVotes();
+    showMessage("Votes confirmed! Redirecting to Mood Selection...")
+
+  /* 
+  Venter 3 sekunder, så brugeren kan nå at læse beskeden,
+  før siden redirecter tilbage til mainpage.html.
+  3000 = 3000 millisekunder = 3 sekunder.
+  */
+  setTimeout(function() {
+  window.location.href = `mainpage.html?session_id=${sessionId}`;
+    }, 3000);
+  } else {
+    console.log("error");
+    showError("It was not possible to add tracks to the TrackFlow!");
+  }
 }
-
 /* 
 Her har vi valgt at gøre funktionerne tilgængelige globalt.
 
