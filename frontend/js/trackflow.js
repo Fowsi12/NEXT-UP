@@ -9,8 +9,8 @@ Kald blot funktionen showError("") og boksen vises med tekst i */
 import { showError } from './ui_errorbox.js';
 const errorBox = document.getElementById("errorBox");
 
-/* addSongToVotes funktion fra ./mainpage, så vi kan bruge samme funktion til vote button */
-import { addSongToVotes } from "./mainpage.js";
+/* addTrackToVotes funktion fra ./mainpage, så vi kan bruge samme funktion til vote button */
+import { addTrackToVotes } from "./mainpage.js";
 
 
 /* SHOW/HIDE BUTTON TIL TRACKFLOW QUEUE */
@@ -53,7 +53,7 @@ async function renderQueue() {
   if (queue.length === 0) {
     const emptyMessage = document.createElement("li");
     emptyMessage.className = "trackFlow";
-    emptyMessage.textContent = "Flows has yet to be shared...";
+    emptyMessage.textContent = "Flow has yet to be started...";
     trackFlowList.appendChild(emptyMessage);
     return;
   }
@@ -61,12 +61,12 @@ async function renderQueue() {
   queue.forEach(function(track, index) {
     const li = document.createElement("li");
           li.className = "trackFlowRow";
-          li.textContent = `${index + 1}. ${track.track_title} - ${track.artist} - (${track.vote_count} votes) `;
+          li.textContent = `${index + 1}. ${track.track_title || "Unknown track"} - ${track.artist || "Unknown artist"} - (${track.vote_count || "Unknown vote count"} votes) `;
     const voteButton = document.createElement("button");
           voteButton.className = "voteBtn CircleBtn";
           voteButton.innerHTML = `<img src="images/vote_button.png" class="centerBtnImg">`;
           voteButton.addEventListener("click", function() {
-            addSongToVotes(track);
+            addTrackToVotes(track);
           });
     li.appendChild(voteButton);
     trackFlowList.appendChild(li);

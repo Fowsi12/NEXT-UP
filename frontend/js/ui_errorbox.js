@@ -12,7 +12,7 @@ export function showError(message) {
 /* clearTimeout:
 nulstiller errorTimeout funktionen hver gang showError funktionen kaldes */
 
-  errorBox.textContent = message;
+  errorBox.innerHTML = message;
   errorBox.style.display = "block";
 
   setTimeout(function() {
@@ -39,7 +39,7 @@ export function showMessage(message) {
 /* clearTimeout:
 nulstiller errorTimeout funktionen hver gang showError funktionen kaldes */
 
-  messageBox.textContent = message;
+  messageBox.innerHTML = message;
   messageBox.style.display = "block";
 
   setTimeout(function() {

@@ -12,32 +12,37 @@ Hvis brugeren ikke synes om de 5 sange kan brugeren klikke på refresh-knappen, 
 /* ERROR BOX: 
 viser fejltekst i en popup box der forsvinder af sig selv
 Kald blot funktionen showError("") og boksen vises med tekst i */
-import { showError } from './ui_errorbox.js';
+import { showError, showMessage } from './ui_errorbox.js';
 const errorBox = document.getElementById("errorBox");
+const messageBox = document.getElementById("messageBox"); 
 
 const moodContainer = document.getElementById("moodcontainer"); //container til mood knapper
 let isMoodBoxOpen = null // variabel til at se, om MoodBox er åben eller lukket
 let allTracks = []; /* variabel til alle tracks */
+let sessionId /* variabel til session_id fra localStorage */
+let votesKey /* variabel til den localStorage-key, som MyVotes skal gemmes under. */
+let votes /* variabel til at gemme listen med brugerens midlertidige votes (som ikke er bekræftet endnu) */
 
 
-// TODO: Vis noget loading inden knapperne er dannet, eller spørg Mikkel til loading rækkefølgen?
+// TODO: 
+// Vis noget loading inden knapperne er dannet? 
+// HVORFOR LOADER VI ALLE TRACKS OG MOODS NÅR SIDEN STARTES? 
 
 
 /* HENT ALLE TRACKS & MOODS FRA DB */
 document.addEventListener("DOMContentLoaded", loadTracks);
 async function loadTracks() {
-    const response = await fetch('/api/moods/tracks');
     /* await fetch:
     henter tracks fra backend via api
     await fetch giver ikke data med det samme. 
     Den returnerer et promise ("jeg er gået i gang med HTTP request, resultatet kommmer senere")
     Await fortæller at funktionen stopper indtil der kommer svar. 
     Men browseren kan stadig køre andre events*/
+    const response = await fetch('/api/moods/tracks');
     console.log("Response:" + response.status);
     if (response.ok) {
         allTracks = await response.json();
-        console.log("Loaded list of all tracks from database:");
-        console.log(allTracks);
+        console.log("Loaded list of all tracks from database:", allTracks);
     } else {
         console.log("error");
         showError("It was not possible to load any tracks from the database!");
@@ -81,7 +86,7 @@ async function loadMoods() {
                     moodBox.classList.add("active");
                 } else {
                     console.log("Can't find moodBox",target);
-                    showError("Cannot open the chosen mood menu")
+                    showError("Error: No menu exist for the chosen mood")
                 }
             });
         div.appendChild(button);/*sætter knappen ind i div'en*/
@@ -104,10 +109,13 @@ document.addEventListener("click", function(event) {
     const button = event.target.closest(".openMoodBox"); /* button rammer det element, der er tættest på med sit click event */
     if (button) {
         targetBox = button.dataset.target;
-/* button.dataset.target:
-const targetBox oprettes fra attributten "data-target" fra html 
-I html har hver knap sit eget data-target, så de kan pege på hver sin class*/
+        /* button.dataset.target:
+        const targetBox oprettes fra attributten "data-target" fra html 
+        I html har hver knap sit eget data-target, så de kan pege på hver sin class*/
         const box = document.getElementById(targetBox);
+        if (!box) {
+            return;
+        }
         /* const box: 
         DOM Element, fx <div id="chill" class="moodBox">
         Det er den box, som vi vil ændre på (åbne).
@@ -122,12 +130,10 @@ I html har hver knap sit eget data-target, så de kan pege på hver sin class*/
             box.style.display = "block";
             isMoodBoxOpen = true
             console.log("isMoodBoxOpen: " + isMoodBoxOpen + " --- The " + targetBox + " MoodBox is open!")
-        setTimeout(function () {
-            box.style.opacity = "1";
-            box.style.pointerEvents = "auto";
-        }, 200);
-        } else {
-            console.log("Can't find moodBox",targetBox);
+            setTimeout(function () {
+                box.style.opacity = "1";
+                box.style.pointerEvents = "auto";
+            }, 200);
         }
     }
 });
@@ -214,40 +220,90 @@ function getTracksForMood(allTracks, mood) {
 }
 
 
-/* Funktion til at blande sange og returnere 5 */
+/* getFiveTracks(tracksForMood): 
+Funktion til at blande sange og returnere 5 
+1. Funktionen tager tracksForMood som argument
+2. Filtrerer sange fra, som brugeren allerede er stemt på (via MyVotes/localStorage)
+3. Blander sangene i arrayet
+4. Returnerer 5 sange som kan vises som forslag til brugeren */
 // TODO: Spørg Mikkel om vi har en side-effekt her? Er det korrekt måde at slice et array på? // Lige nu: Hver gang vi kalder funktionen, skal vi gøre det med alle sange forfra for at vi ikke får biprodukt. 
 function getFiveTracks(tracksForMood) {
-    const mixedTracks = tracksForMood.sort(function(){
+    votes = getMyVotes();
+    console.log("votes:", votes);
+    /* Filtrering:
+    Filtreringen tager elementerne(tracks) fra arrayet "votes" (fra localStorage), 
+    og matcher dem én ad gangen med elementerne i arrayet "tracksForMood".
+    Hvis der ikke findes et match bliver sangen pushed på det nye array. 
+    Hvis der findes et match baseret på id, bliver sangen ikke pushed på det nye array. 
+    *** Eksempel: ***
+    - Er votes[0] === tracksForMood[0]? 
+    - Hvis nej, forbliver alreadyVoted som false og sangen pushes på det nye array "tracksExclMyVotes". 
+      Den går (pga. j++) videre til votes[1]. 
+      Er der ikke flere votes, springer den gennem det første while loop med i-tælleren igennem uden at kigge på flere votes.
+    - Hvis ja, sættes alreadyVoted=true, og j++, og sangen pushes ikke på det nye array "tracksExclMyVotes".
+    */
+    let tracksExclMyVotes = []; // nyt array til de tracks, som brugeren ikke har stemt på endnu
+    let i = 0; // tæller til hvert element(track) til det valgte mood
+    while (i < tracksForMood.length) { 
+        let alreadyVoted = false; // variabel til at styre, om track skal pushes på det nye array eller ej
+        let j = 0; // tæller til hvert element(track) til MyVotes listen
+        while (j < votes.length && alreadyVoted === false) {
+            if ((votes[j].track_id || votes[j].id) === (tracksForMood[i].track_id || tracksForMood[i].id)) {
+                alreadyVoted = true; 
+            }
+            j++;
+        }
+        if (alreadyVoted === false) {
+            tracksExclMyVotes.push(tracksForMood[i]);
+        }
+        i++;
+    }
+    
+    if (tracksExclMyVotes.length === 0) {
+    /* if(tracksExclMyVotes =[]):
+    hvis alle de tracks, vi stiller til rådighed for det valgte mood matcher
+    tracks, som findes i brugeres MyVotes liste, så viser vi en besked, 
+    der fortæller, at brugeren har stemt på alle tracks til det valgte mood 
+    return [], ellers fortsætter funktionen og shuffler indexes i et tomt array... hvilket ikke giver mening*/
+        showMessage("You have already voted for all tracks in this mood")
+        return [];
+    }
+    /* mixedTracks:
+    Vi blander rækkefølgen på indexes i arrayet. 
+    .sort: sorterer et array.
+    .sort kigger på to indexes ad gangen og placerer dem. 
+    fx numers.sort() sætter indexes fra lav til høj værdi. 
+    Her siger vi, at den skal sorterer efter en funktion med math.random metode. 
+    Math.random returnerer et tilfældigt decimaltal mellem 0 og 1. 
+    Vi trækker 0.5 fra, så vi får tal mellem -0.5 og 0.5. 
+    Hvis vi returnerer et negativt tal til .sort, sætter den [0] før [1]
+    Hvis vi returnerer et positivt tal til .sort, sætter den [1] før [0]/bytter rækkefølgen.
+    */
+    const mixedTracks = tracksExclMyVotes.sort(function() {
         return Math.random() - 0.5; 
-        /* .sort: 
-        vi sorterer i arrayet med Math.random (dvs. blander indexes tilfældigt) 
-        laver et tilfældigt tal mellem 0 og 1, og bruges til at blande listen */
     });
-    console.log("Shuffled 5 new tracks for selected mood: (" + tracksForMood[0].mood + ")")
-    console.log(mixedTracks.slice(0, 5));
     return mixedTracks.slice(0, 5);
     /* mixedTracks.slice:
-    tager index 0 til 4 af de blandede indexes og returneres */
+    tager fra og med index 0 til 4 og returnerer */
 }
 
 
 /*GENERERE SANGELISTE TIL MOODBOXES*/
 function renderTracks(tracks, box) {
-    const moodTrackList = box.querySelector(".moodTrackList"); /* finder alle elementer i vores box med class="moodTrackList" */
+    const moodTrackList = box.querySelector(".moodTrackList"); /* finder første element i vores boxes med class="moodTrackList" */
     moodTrackList.innerHTML = ""; /* rydder indholdet i elementet sange fra pop-up vinduet */
     
     if (tracks.length === 0) { /* hvis der ikke er mixed/shuffled nogen sange getFiveTracks funktionen */
-        showError("It was not possible to render any tracks for this mood");
         return;
     } else {
         tracks.forEach(function(track) {
-            /* opretter én div pr. sang, rækkerne har class="moodTrackRow" */
-            const moodTrackRow = document.createElement("div");
-            moodTrackRow.classList.add("moodTrackRow");
+            /* opretter én li pr. sang og tilføjer class="moodTrackRow" */
+            const li = document.createElement("li");
+            li.classList.add("moodTrackRow");
             
             /* opretter en text container, class="trackText" */          
-            const moodTrackText = document.createElement("p"); 
-            moodTrackText.classList.add("moodTrackText");
+            const trackText = document.createElement("div"); 
+            trackText.classList.add("moodTrackText");
 
             /* 
             Indsætter sangens tekst.
@@ -255,38 +311,39 @@ function renderTracks(tracks, box) {
             track.artist_name virker kun, hvis backend også sender artist_name med.
             Hvis artist_name ikke findes endnu, viser vi "Unknown artist" i stedet for undefined. 
             */
-            moodTrackText.textContent = `${track.track_title || "Unknown track"} - ${track.artist || "Unknown artist"}`;
+            trackText.textContent = `${track.track_title || "Unknown track"} - ${track.artist || "Unknown artist"}`;
             
             /* opretter vote knap, class="voteBtn", indsætter billede */
             const voteButton = document.createElement("button");
             voteButton.className = "voteBtn CircleBtn";
+            voteButton.title = "Add track to My Votes";
             voteButton.innerHTML = `<img src="images/vote_button.png" class="centerBtnImg">`;
 
-            /* Kalder addSongToVotes:
+            /* Kalder addTrackToVotes:
             Når brugeren klikker på vote-knappen ved en sang,
-            kaldes addSongToVotes funktionen, som gemmer sangen i localStorage
+            kaldes addTrackToVotes funktionen, som gemmer sangen i localStorage
             */
             voteButton.addEventListener("click", function () {
-                addSongToVotes(track);
+                addTrackToVotes(track);
                 voteButton.innerHTML = "Added";
                 voteButton.disabled = true;
                 voteButton.classList.add("voteBtnAdded");
+                voteButton.style.cursor = "not-allowed"
             });
             
             /* indsætter text og knap i rækkerne */
-            moodTrackRow.appendChild(moodTrackText);
-            moodTrackRow.appendChild(voteButton);
+            li.appendChild(trackText);
+            li.appendChild(voteButton);
 
             /* indsætter rækken i trackList div */
-            moodTrackList.appendChild(moodTrackRow);
+            moodTrackList.appendChild(li);
         });
     }
 }
 
 
 
-
-/* ADD SONG TO VOTES
+/* ADD TRACK TO VOTES
 Denne funktion gemmer en valgt sang i localStorage.
 
 Sangen gemmes sammen med den aktuelle session_id.
@@ -300,94 +357,94 @@ votes_session_28
 /*
 Formålet er:
 1. At finde den session brugeren er i
-2. At finde de votes/sange, der allerede er gemt for den session
-3. At tjekke om sangen allerede er valgt
-4. At gemme sangen i localStorage
-5. Så myvotes.html senere kan hente og vise sangen
+2. At finde de tracks, som brugeren allerede har trykket Vote på, men ikke har bekræftet endnu (My Votes listen)
+3. At forhindre sangen i at blive tilføjet 2 gange samtidig til MyVotes
+4. At gemme sangen i localStorage, så myvotes.html senere kan hente og vise sangen
 */
-export function addSongToVotes(song) {
-  /* Henter session_id fra localStorage.
+export function addTrackToVotes(track) {
+    votes = getMyVotes();
 
-  session_id bliver gemt, når brugeren enten:
-  - opretter en session i createsession.js
-  - joiner en session i joinsession.js
+    /* alreadyVoted:
+    Tjekker om sangen allerede findes i brugerens votes-liste fra LocalStorage.
+    While loopet kører gennem elementerne i "votes". 
+    Hvis den finder et match mellem track_id/id i votes og tracks, 
+    ændres alreadyVoted stopper while loopet. 
+    Vi bruger både track_id og id som en sikkerhed, hvis der skulle ske at opstå 
+    forskellighed i data når udveksles mellem frontend/backend.
+    */
+    let alreadyVoted = false;
+    let i = 0;
+    while (i < votes.length && alreadyVoted === false) {
+      if ((votes[i].track_id || votes[i].id) === (track.track_id || track.id)) {
+          alreadyVoted = true;
+      }
+      i++;
+    }
 
-  Eksempel:
-  sessionId = "28"
-  */
-  const sessionId = localStorage.getItem("session_id");
+    if (alreadyVoted) {
+      showError("This track has already been added to My Votes.");
+      return;
+    /* if (alreadyVoted): 
+    Hvis sangen findes i votes fra localStorage, vises en fejlbesked,
+    og funktionen stopper for at forhindre, sangen tilføjes flere gange. 
+    */
+    }
 
-  /* Hvis der ikke findes en session_id, betyder det at brugeren
-  ikke er i en session endnu.
+    /* votes.push(track):
+    Sangen tilføjes til votes-arrayet.
+    */
+    votes.push(track);
 
-  Derfor stopper vi funktionen med return,
-  så sangen ikke bliver gemt forkert.
-  */
-  if (!sessionId) {
-    showError("You are not in a session.");
-    return;
-  }
+    /* localStorage.setItem:
+    Gemmer den opdaterede votes-liste i localStorage.
+    JSON.stringify bruges, fordi localStorage kun kan gemme tekst.
+    Derfor laver vi arrayet om til en string, før det gemmes.
+    */
+    localStorage.setItem(votesKey, JSON.stringify(votes));
 
-  /* Her laver vi navnet på den localStorage-key,
-  som sangene skal gemmes under.
+    /* Logger i console, så vi kan tjekke at sangen faktisk bliver gemt */
+    console.log("Song added to votes:", track);
 
-  Vi bruger session_id i navnet, så hver session har sin egen liste.
+    /* Logger hele vote-listen for den aktuelle session */
+    console.log("Votes for session:", votes);
+}
 
-  Eksempel:
-  Hvis session_id = 28
-  bliver votesKey = "votes_session_28"
-  */
-  const votesKey = `votes_session_${sessionId}`;
+/* HENTER SANGE FRA MYVOTES LISTE SOM IKKE ER CONFIRMED ENDNU */
+function getMyVotes() {
+    /* Henter session_id fra localStorage.
 
-  /* Henter de sange, der allerede er valgt i denne session.
+    session_id bliver gemt, når brugeren enten:
+    - opretter en session i createsession.js
+    - joiner en session i joinsession.js
 
-  localStorage gemmer kun tekst/string.
-  Derfor bruger vi JSON.parse til at lave teksten om til et JavaScript-array igen.
+    Eksempel:
+    sessionId = "28"
+    */
+    sessionId = localStorage.getItem("session_id");
 
-  Hvis der ikke er gemt nogen sange endnu, bruger vi en tom liste [].
-  */
-  const votes = JSON.parse(localStorage.getItem(votesKey)) || [];
+    if (!sessionId) {
+      showError("You are not in a session. Please create or join session again");
+      return;
+    /* if (!sessionId):
+    Hvis der ikke findes en sesion_id, stopper vi funktionen med return
+    Det er for at undgå at sangene bliver gemt forkert i LocalStorage*/
+    }
 
-  /* Tjekker om sangen allerede findes i votes-listen.
+    /* votesKey:
+    Variabel til den localStorage-key, som MyVotes skal gemmes under.
+    Vi bruger session_id i navnet, så hver session har sin egen liste.
+    Eksempel:
+    Hvis session_id = 28
+    bliver votesKey = "votes_session_28"
+    */
+    votesKey = `votes_session_${sessionId}`;
 
-  .some() går igennem listen og returnerer true,
-  hvis mindst én sang matcher den sang, brugeren prøver at tilføje.
-
-  Vi bruger både track_id og id, fordi sang-objekter kan have forskellige navne
-  alt efter hvordan de kommer fra frontend/backend.
-
-  Eksempel:
-  song.track_id eller song.id
-  */
-  const alreadyChosen = votes.some((vote) => {
-    return (vote.track_id || vote.id) === (song.track_id || song.id);
-  });
-
-  /* Hvis sangen allerede er valgt, viser vi en fejlbesked
-  og stopper funktionen.
-
-  Det forhindrer, at samme sang bliver tilføjet flere gange.
-  */
-  if (alreadyChosen) {
-    showError("This song is already added to My Votes.");
-    return;
-  }
-
-  /* Hvis sangen ikke allerede findes i listen,
-  tilføjer vi sangen til votes-arrayet.
-  */
-  votes.push(song);
-
-  /* Gemmer den opdaterede votes-liste i localStorage.
-
-  JSON.stringify bruges, fordi localStorage kun kan gemme tekst.
-  Derfor laver vi arrayet om til en string, før det gemmes.
-  */
-  localStorage.setItem(votesKey, JSON.stringify(votes));
-
-  /* Logger i console, så vi kan tjekke at sangen faktisk bliver gemt */
-  console.log("Song added to votes:", song);
-
-  /* Logger hele vote-listen for den aktuelle session */
-  console.log("Votes for session:", votes);
+    votes = JSON.parse(localStorage.getItem(votesKey)) || [];
+    /* votes:
+    Henter de sange, der allerede er valgt i denne session.
+    localStorage gemmer kun tekst/string.
+    Derfor bruger vi JSON.parse til at lave teksten om til et JavaScript-array igen.
+    Hvis der ikke er gemt nogen sange endnu, bruger vi en tom liste [].
+    */
+    return votes;
 }

@@ -40,11 +40,10 @@ let lastDeletedTrack = [];
   er tilføjet nogen sange første gang siden vises, og ikke hver gang 
   der ikke er nogen sange på votes listen (som følge af at brugeren sletter
   alle sangene på listen) */
-let isInitialLoad = true;
+let isInitialLoad = true
   /* DOMContentLoaded:
 Når html er fuldt indlæset og parsed(fortolket), kaldes renderVotes() */
-document.addEventListener("DOMContentLoaded", renderVotes);
-
+document.addEventListener("DOMContentLoaded", renderVotes());
 
 
 /* RENDER LISTEN AF TRACKS SOM BRUGER HAR STEMT PÅ */ 
@@ -85,15 +84,13 @@ function renderVotes() {
   if (votes.length === 0) {
     const emptyMessage = document.createElement("li");
     emptyMessage.className = "zeroVotesMessage";
-    emptyMessage.textContent = "You have not voted for any tracks";
+    emptyMessage.textContent = "No tracks added to My Votes";
     myVotesList.appendChild(emptyMessage);
     if (isInitialLoad) {
       showError("You have not voted for any tracks");
     }
-    isInitialLoad = false;
     return;
   }
-
     /* forEach:
     forEach metoden går gennem alle indexes i votes array'et én ad gangen.
     track = det enkelte track
@@ -102,10 +99,11 @@ function renderVotes() {
   votes.forEach(function(track, index) {
       /* Opretter et <li>-element pr. track */
     const li = document.createElement("li");
-      /* Giver <li> class="myVotesColumn", så vi kan style den i CSS */
-    li.className = "myVotesColumn";
+      /* Giver <li> class="myVotesRow", så vi kan style den i CSS */
+    li.className = "myVotesRow";
       /* Opretter et <div>-element til track title og delete knap */
     const trackText = document.createElement("div");
+    trackText.classList.add("myVotetrackText")
 
       /* Render tekst med nummerering, sangtitel og artistnavn:
           Eksempel på resultat:
@@ -125,7 +123,7 @@ function renderVotes() {
       * track.artist:
         Kalder alle sangenes artistnavne fra listen på samme måde som track_title.
       */
-    trackText.textContent = `${index + 1}. ${track.track_title} - ${track.artist}`;
+    trackText.textContent = `${index + 1}. ${track.track_title || "Unknown track"} - ${track.artist || "Unknown artist"}`;
        
       /* Opretter en slet-knap pr. track 
         Knappen tildeles properties: classes og title og vi tilføjer et img-tag i knappen. 
@@ -167,6 +165,7 @@ Vi beholder kun de sange i det nye array, hvor id IKKE matcher trackId.
 
 Den slettede sang pushes til variablen lastDeletedTrack, som hele tiden vokser. 
 */
+
 function removeTrack(trackId) {
 /* getSessionVotes():
 Kalder funktionen og henter den nuværende liste af valgte sange på MyVotes fra LocalStorage */
@@ -187,7 +186,6 @@ Kalder funktionen og henter den nuværende liste af valgte sange på MyVotes fra
 /* saveSessionVotes(votes):
 Det opdaterede array gemmes i localStorage */
   saveSessionVotes(votes);
-
 /* renderVotes():
 Render listen med MyVotes igen, så siden opdateres med det samme */
   renderVotes();
@@ -297,7 +295,6 @@ function getTrackId(track) {
 }
 
 
-// TODO: deleteAllVotes skal påvirke lastDeletedTrack
 /* DELETE ALL VOTES */
 /* Her sletter vi alle valgte sange for den aktuelle session.
 SessionId hentes fra LocalStorage. 
@@ -305,6 +302,7 @@ Votes hentes fra LocalStorage.
 Vi gemmer bare et tomt array [].
 Så findes sessionen stadig, men vote-listen er tom.
 */
+document.querySelector(".deleteAllVotes").addEventListener("click", deleteAllVotes);
 function deleteAllVotes() {
   const sessionId = getCurrentSessionId();
   const votes = getSessionVotes();
@@ -334,6 +332,7 @@ function deleteAllVotes() {
   * saveSessionVotes(votes) gemmer ændringen
   * renderVotes() opdaterer UI
   */
+document.querySelector(".undoOne").addEventListener("click", undoDelete);
 function undoDelete() {
   if (lastDeletedTrack.length === 0) {
     showError("Nothing to undo! No tracks has been deleted from vote list");
@@ -350,13 +349,9 @@ function undoDelete() {
 /* CONFIRM ALL VOTES */
 /* confirmVotes():
 Bekræfter alle votes på listen.
-
-TODO: 
-Lige nu sender funktionen ikke noget til backend endnu.
-Den logger bare session_id og votes i console.
-Senere kan denne funktion udvides til at sende votes til server.js, 
-så de kan gemmes i databasen.
+Votes sendes til server.js, hvor tracks indsættes i sessions_tracks, hvilket indlæses af vores afspilningskø.
 */
+document.querySelector(".confirmVotes").addEventListener("click", confirmVotes);
 async function confirmVotes() {
   const sessionId = getCurrentSessionId();
   const votes = getSessionVotes();
@@ -392,8 +387,7 @@ async function confirmVotes() {
     console.log(votes);
     saveSessionVotes([]);
     renderVotes();
-    showMessage("Votes confirmed! Redirecting to Mood Selection...")
-
+    showMessage(`Votes confirmed!<br>Redirecting to Mood Selection<br>&nbsp;<span class="loadingDots"></span>`);
   /* 
   Venter 3 sekunder, så brugeren kan nå at læse beskeden,
   før siden redirecter tilbage til mainpage.html.
@@ -407,32 +401,15 @@ async function confirmVotes() {
     showError("It was not possible to add tracks to the TrackFlow!");
   }
 }
-/* 
-Her har vi valgt at gøre funktionerne tilgængelige globalt.
-
-Det er nødvendigt, fordi myvotes.html bruger onclick direkte i HTML, fx:
-onclick="undoDelete()"
-
-Uden window.undoDelete = undoLastVote ville HTML'en ikke kunne finde funktionen.
-*/
-window.removeTrack = removeTrack;
-window.undoDelete = undoDelete;
-window.deleteAllVotes = deleteAllVotes;
-window.confirmVotes = confirmVotes;
 
 
-/* INVITE FRIEND
+/* INVITE FRIEND:
 Denne del styrer Invite friend-knappen på myvotes.html.
-Knappen viser den session_id, som en ven skal bruge på Join-siden.
-*/
-
-/*
+Knappen viser det session_id, som en ven skal bruge på Join-siden.
 Når brugeren klikker på knappen:
 1. Finder vi session_id fra localStorage
 2. Viser session_id i popup'en
-3. Vennen kan bruge dette id på Join-siden
 */
-
 /* Finder Invite friend-knappen fra HTML */
 const inviteFriendButton = document.getElementById("inviteFriendButton");
 

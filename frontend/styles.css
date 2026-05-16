@@ -12,7 +12,7 @@ body {
   text-align: center;
   color: white;
 }
-#centerContent {
+.centerContent {
   display: flex;
   flex-direction: column; /* Alt i centerContent stables lodret */
   align-items: center; /* ALT I centercontent centreres */
@@ -59,7 +59,7 @@ id="errorBox
   border-radius: 8px;
   
   opacity: 0; /* starter synlig */
-  transition: opacity 0.5s ease;
+  transition: opacity 0.5s;
   display: none; /* skjult som default */
   pointer-events: none; /* så den ikke blokerer klik */
 }
@@ -79,14 +79,36 @@ id="errorBox
   border-radius: 8px;
   
   opacity: 0; /* starter synlig */
-  transition: opacity 0.5s ease;
+  transition: opacity 0.5s;
   display: none; /* skjult som default */
   pointer-events: none; /* så den ikke blokerer klik */
+}
+/* LOADING PERIODS ANIMATED . .. ...*/
+.loadingDots::after {
+  content: " ";
+  animation: dots 1.5s steps(4, end) infinite;
+}
+@keyframes dots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
 }
 
 /* MOOD MENU */
 /*mood knapper layout*/
-.moodMenu{ 
+.moodMenu { 
   display: grid;
   grid-template-columns: repeat(2,1fr);
   gap: 12px;
@@ -102,19 +124,22 @@ id="errorBox
   padding: 2.5%; /* afstand fra kanter til indhold i boxen */
 
   opacity: 0; /*0=gennemsigtig, 1=uigennemsigtig,*/
-  transition: opacity 0.5s;
+  transition: opacity 0.5s ease;
   display: none; /* none=usynlig, block=synlig */
   pointer-events: auto; /*none=alle mouse&touch events ignoreres, auto=normal opførsel*/
 
   background-color: #2c352d;
   border: 3px solid #b300ff;
   border-radius: 16px;
-  color: white;
 }
 /* OVERSKRIFTER I MOOD POPUP BOXES */
-.moodTitle {
+.moodHeader {
   text-align: center;
   color: white;
+}
+.moodTrackList {
+  color: white;
+  width: 85%;
 }
 /* CLOSE BUTTON I MOOD BOXES*/
 .closeMoodBox {
@@ -130,15 +155,14 @@ id="errorBox
 .closeMoodBox:hover {
   background-color: rgb(255, 63, 63);
 }
-.aboveMoodTrackList {
+.aboveMoodTrackList { /*knapper lige over listen med tracks */
  display: flex;
  justify-content: flex-end; /* sætter knappperne ud mod højre */
- gap: 10px;
- margin-bottom: 20px;
+ gap: 15px;
 }
 .refreshTracks {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   z-index: 11;
   cursor: pointer;
   background-color: rgb(100, 2, 109);
@@ -162,7 +186,7 @@ id="errorBox
   border: none;
   flex-direction: row;
   width: 100px;
-  height: 40px;
+  height: 50px;
   z-index: 11;
   cursor: pointer;
   background-color: rgb(100, 2, 109);
@@ -175,29 +199,34 @@ id="errorBox
 .myVotesButton:hover {
   background-color: rgb(190, 5, 206);
 }
-
-/* VOTE BUTTON I MOOD POPUP BOXES */
-.voteBtn {
+.voteBtn {/* VOTE BUTTON I MOOD POPUP BOXES */
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background:#45c226;
+    background-color: rgb(100, 2, 109);
     color: white;
     border: none;
     cursor: pointer;
 }
-/* FIVE TRACKS LIST I MOOD BOXES */
-.moodTrackRow {
+.voteBtn:hover {
+  background-color: rgb(190, 5, 206);
+}
+.moodTrackRow {/* FIVE TRACKS LIST I MOOD BOXES */
   display: flex; /* lægger tekst og voteBtn på samme linje */
   justify-content: space-between; /* skubber tekst og voteBtn ud til hver side */
   align-items: center; /*centrerer knappen vertikalt i forhold til tekst i samme div */
-  gap: 15px; /* minimum mellemrum mellem tekst og votebtn */
+  gap: 15px; /* minimum mellemrum mellem tekst og votebtn - safety */
+  margin: 10px 0;
   padding: 5px 40px 5px 40px; /* afstand fra top, højre, bund, venstre inde i rækkerne */
   border-left: 2px solid black;
   border-right: 2px solid black;
   border-bottom: 2px solid black;
   background-color: blueviolet;
-  border-radius: 16px;
+  border-radius: 12px;
+}
+.moodTrackRow {
+  margin-right: 24px;
+  padding: 12px;
 }
 /* TEKST DER VISER TRACKS & ARTIST I MOOD BOXES */
 .trackText {
@@ -301,7 +330,7 @@ id="errorBox
 .deleteBtn:hover {
   background-color: rgb(255, 63, 63);
 }
-.myVotesColumn,
+.myVotesRow,
 .zeroVotesMessage {
   background: rgba(255,255,255,0.1);
   margin: 10px 0;

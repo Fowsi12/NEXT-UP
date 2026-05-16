@@ -19,7 +19,7 @@
     </header>
 
       <!-- ALT I centerContent centreres og stables lodret -->
-    <div id="centerContent">
+    <div class="centerContent">
       <!--MOOD MENU-->
       <!--tom div til moodbox de knapper, som JS opretter-->
       <div id="moodcontainer" class="moodMenu">
@@ -27,7 +27,7 @@
 
       <!-- MOOD POPUP BOXES-->
       <div class="moodBox" id="energetic">
-        <h2 class="moodTitle">Energetic tracks</h2>
+        <h2 class="moodHeader">Energetic tracks</h2>
           <button class="closeMoodBox CircleBtn" title="Close mood window">
             <img src="images/close.png" class="centerBtnImg">
           </button>
@@ -39,11 +39,13 @@
               My Votes
             </button>
           </div>
-          <div class="moodTrackList"></div>
+          <div class="centerContent">
+            <ul class="moodTrackList"></ul>
+          </div>
       </div>
 
       <div class="moodBox" id="chill">
-        <h2 class="moodTitle">Chill tracks</h2>
+        <h2 class="moodHeader">Chill tracks</h2>
           <button class="closeMoodBox CircleBtn" title="Close mood window">
             <img src="images/close.png" class="centerBtnImg">
           </button>
@@ -59,7 +61,7 @@
       </div>
 
       <div class="moodBox" id="party">
-        <h2 class="moodTitle">Party tracks</h2>
+        <h2 class="moodHeader">Party tracks</h2>
           <button class="closeMoodBox CircleBtn" title="Close mood window">
             <img src="images/close.png" class="centerBtnImg">
           </button>
@@ -75,7 +77,7 @@
       </div>
 
       <div class="moodBox" id="happy">
-        <h2 class="moodTitle">Happy tracks</h2>
+        <h2 class="moodHeader">Happy tracks</h2>
           <button class="closeMoodBox CircleBtn" title="Close mood window">
             <img src="images/close.png" class="centerBtnImg">
           </button>
@@ -91,7 +93,7 @@
       </div>
 
       <div class="moodBox" id="romantic">
-        <h2 class="moodTitle">Romantic tracks</h2>
+        <h2 class="moodHeader">Romantic tracks</h2>
           <button class="closeMoodBox CircleBtn" title="Close mood window">
             <img src="images/close.png" class="centerBtnImg">
           </button>
@@ -107,7 +109,7 @@
       </div>
       
       <div class="moodBox" id="lounge">
-        <h2 class="moodTitle">Lounge tracks</h2>
+        <h2 class="moodHeader">Lounge tracks</h2>
           <button class="closeMoodBox CircleBtn" title="Close mood window">
             <img src="images/close.png" class="centerBtnImg">
           </button>
@@ -156,5 +158,7 @@
 
       <!--Tom div til fejlmeddelelser. Lad den ligge nederst-->
     <div id="errorBox"></div>
+      <!--Tom div til messageBox. Lad den ligge nederst-->
+    <div id="messageBox"></div>
   </body>
 </html>
