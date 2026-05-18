@@ -80,6 +80,7 @@ await db.query /*SESSIONS_TRACKS*/ (`
   create table sessions_tracks (
     session_id          bigserial       not null references sessions (session_id),
     track_id            integer         not null references tracks (track_id),
+    added_by_system     boolean         default false,
     added_at            timestamp       default current_timestamp
   )
 `);
@@ -135,10 +136,16 @@ await upload(db, 'db/tracks_moods.csv',`
 `);
 
 await upload(db, 'db/sessions_tracks.csv',`
-    copy  sessions_tracks (session_id, track_id, added_at)
+    copy  sessions_tracks (session_id, track_id, added_by_system)
     from  stdin
     with  csv header encoding 'UTF-8'
 `);
+/* vi kopierer ikke added_by_user og added_at fra csv - 
+vores preudfyldte "ghost sessions" i csv har ingen værdier i kolonnerne, 
+så de vil kopieres ind i db med null, og vi kan risikere mærkelig sortering.
+I stedet får de her default værdierne, 
+hvv. false og current_timestamp (tidspunktet hvor rækken bliver indsat)
+*/
 
 await upload(db, 'db/votes.csv', `
     copy votes (session_id, user_id, track_id)

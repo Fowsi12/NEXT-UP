@@ -17,7 +17,7 @@ async function joinSession() {
   const sessionId = sessionInput.value.trim();
 
   if (!sessionId) {
-    showError("Insert session ID first");
+    showError("Enter session ID");
     return;
   }
 

@@ -11,12 +11,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <title>Mainpage</title>
   </head>
   <body>
     <header>
       <h1 class="binaryFlowHeader">BinaryFlow</h1>
     </header>
+    <h2 class="subHeader">Mood Selection</h2>
 
       <!-- ALT I centerContent centreres og stables lodret -->
     <div class="centerContent">
@@ -24,7 +28,7 @@
       <!--tom div til moodbox de knapper, som JS opretter-->
       <div id="moodcontainer" class="moodMenu">
       </div>
-
+      
       <!-- MOOD POPUP BOXES-->
       <div class="moodBox" id="energetic">
         <h2 class="moodHeader">Energetic tracks</h2>
@@ -57,7 +61,9 @@
               My Votes
             </button>
           </div>
-          <div class="moodTrackList"></div>
+          <div class="centerContent">
+            <ul class="moodTrackList"></ul>
+          </div>
       </div>
 
       <div class="moodBox" id="party">
@@ -73,7 +79,9 @@
               My Votes
             </button>
           </div>
-          <div class="moodTrackList"></div>
+          <div class="centerContent">
+            <ul class="moodTrackList"></ul>
+          </div>
       </div>
 
       <div class="moodBox" id="happy">
@@ -89,7 +97,9 @@
               My Votes
             </button>
           </div>
-          <div class="moodTrackList"></div>
+          <div class="centerContent">
+            <ul class="moodTrackList"></ul>
+          </div>
       </div>
 
       <div class="moodBox" id="romantic">
@@ -105,7 +115,9 @@
               My Votes
             </button>
           </div>
-          <div class="moodTrackList"></div>
+          <div class="centerContent">
+            <ul class="moodTrackList"></ul>
+          </div>
       </div>
       
       <div class="moodBox" id="lounge">
@@ -121,7 +133,9 @@
               My Votes
             </button>
           </div>
-          <div class="moodTrackList"></div>
+          <div class="centerContent">
+            <ul class="moodTrackList"></ul>
+          </div>
       </div>
     </div>
 
@@ -155,6 +169,28 @@
       <ul id="trackFlowList" class="trackFlowList"></ul>
     </div>
 
+     <!-- INVITE FRIEND BUTTON
+      Denne knap viser det session_id, som en ven kan bruge på Join-siden.-->
+    <button id="inviteFriendButton" class="inviteFriendButton">
+      <img src="images/person_add.png" class="inviteFriendIcon">
+      <p>Invite friend</p>
+    </button>
+
+      <!-- INVITE FRIEND POPUP
+      Denne popup er skjult som standard.
+      Når man trykker på Invite friend, viser JavaScript session_id herinde.
+      -->
+    <div id="inviteFriendPopup" class="inviteFriendPopup">
+      <button id="closeInvitePopup" class="closeInvitePopup CircleBtn">
+        <img src="images/close.png" class="centerBtnImg">
+      </button>
+      <h3>Invite friend</h3>
+      <p>Send this Session ID to your friend:</p>
+      <p id="inviteSessionId" class="inviteSessionId"></p>
+      <p class="inviteHelpText">
+        Your friend should press Join on the front page and enter this ID.
+      </p>
+    </div>
 
       <!--Tom div til fejlmeddelelser. Lad den ligge nederst-->
     <div id="errorBox"></div>

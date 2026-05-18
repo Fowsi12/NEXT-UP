@@ -12,6 +12,7 @@ const errorBox = document.getElementById("errorBox");
 /* addTrackToVotes funktion fra ./mainpage, så vi kan bruge samme funktion til vote button */
 import { addTrackToVotes } from "./mainpage.js";
 
+document.addEventListener("DOMContentLoaded", renderQueue);
 
 /* SHOW/HIDE BUTTON TIL TRACKFLOW QUEUE */
 const trackFlowBox = document.querySelector(".trackFlowBox")
@@ -61,7 +62,7 @@ async function renderQueue() {
   queue.forEach(function(track, index) {
     const li = document.createElement("li");
           li.className = "trackFlowRow";
-          li.textContent = `${index + 1}. ${track.track_title || "Unknown track"} - ${track.artist || "Unknown artist"} - (${track.vote_count || "Unknown vote count"} votes) `;
+          li.textContent = `${index + 1}. ${track.track_title || "Unknown track"} - ${track.artist || "Unknown artist"} - (${track.vote_count || "Unknown amount of"} votes) `;
     const voteButton = document.createElement("button");
           voteButton.className = "voteBtn CircleBtn";
           voteButton.innerHTML = `<img src="images/vote_button.png" class="centerBtnImg">`;
@@ -74,7 +75,23 @@ async function renderQueue() {
 }
 
 
-document.addEventListener("DOMContentLoaded", renderQueue);
+/* Funktion til at holde køen i gang. 
+  Hvis der er 0 sange i køen, inviteres brugeren til at vælge: 
+  ét mood eller alle moods, som playlisten holder sig selv kørende med 
+  sangene genereres med 0 votes, da de oprettes i db med i 
+  tabel sessions_tracks, i kolonne added_by_system, med værdi true. 
+  Derfor tæller system genererede votes 0*/
+async function secureTrackFlow() {
+  const queue = await getSessionQueue();
+
+  if (queue.length > 0) {
+    return;
+  } else {
+    // vis knapper/popup til at render random tracks
+  }
+}
+
+
 /* Henter queue-listen fra databasen til vores TrackFlow box */
 async function getSessionQueue() {
   const sessionId = getCurrentSessionId();
@@ -89,9 +106,10 @@ async function getSessionQueue() {
     return [];
   }
   const trackFlow = await response.json();
-  console.log("loaded tracks for current seession id", currentSessionId, "--- tracks:", trackFlow);
+  console.log("loaded tracks for current seession id", sessionId, "--- tracks:", trackFlow);
   return trackFlow;
 }
+
 
 let currentSessionId
 /* Finder den session brugeren er i via localStorage */
@@ -99,7 +117,3 @@ function getCurrentSessionId() {
   currentSessionId = localStorage.getItem("session_id");
   return currentSessionId;
 }
-
-
-
-

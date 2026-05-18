@@ -181,7 +181,7 @@ async function onAddTracksToQueue(request, response) {
   Promise.all: 
   Det starter alle queries samtidig. Parallelt. 
   Promise.all venter så på, at alle queries er kørt færdige. 
-  Promise.all er gåd når:
+  Promise.all er god når:
   * ting er uafhængige
   * man ønsker hastighed
   * rækkefølgen er ligegyldig
@@ -242,7 +242,7 @@ async function onAddTracksToQueue(request, response) {
     i++;
   }
   /* Svar sendes til frontend:
-  For-of loopet er færdigt, sender vi et svar til frontend.
+  Når alle promise.all queries er færdige, sender vi et svar til frontend.
   
   status(201):
   201 betyder "Created" (Der er oprettet nye rækker i databasen).
@@ -265,7 +265,23 @@ Så frontend får:
 - track_id
 - track_title
 - artist
+- vote_count
 - added_at
+
+SQL: 
+* sum(): 
+  Tæller alle non-null værdier i en kolonne. 
+  Hvis added_by_system er true (ikke-bruger-tilføjet-track), 
+  tælles 0 som vote_count
+* min(): 
+  Returnerer mindste værdi i en kolonne. 
+  Samme track kan findes flere gange i vores tabel, hvis samme track får flere stemmer. 
+  min() på added_at finder første gang, tracket blev sat i tabellen. 
+* order by:
+  Vi sorterer efter vote_count og derefter added_at
+  Derfor står de tracks med flest user-votes øverst, 
+  og hvis 2 tracks har samme antal stemmer, 
+  kommer det track med "ældst" værdi i added_at øverst.
 */
 async function onGetSessionQueue(request, response) {
   const sessionId = parseInt(request.params.sessionId);
@@ -275,33 +291,37 @@ async function onGetSessionQueue(request, response) {
       message: "Session ID mangler eller er ugyldigt.",
     });
   }
-
-  const dbResult = await db.query(`
-  select    sessions_tracks.session_id,
-            tracks.track_id,
-            tracks.title as track_title,
-            artists.stage_name as artist,
-
-            count(sessions_tracks.track_id) as vote_count,
-
-            min(sessions_tracks.added_at) as first_added_at
-  from      sessions_tracks
-  join      tracks
-    on      sessions_tracks.track_id = tracks.track_id
-  join      artists
-    on      tracks.artist_id = artists.artist_id
-  where     sessions_tracks.session_id = $1
-  group by  sessions_tracks.session_id,
-            tracks.track_id,
-            tracks.title,
-            artists.stage_name
-  order by  vote_count desc,
-            first_added_at asc
-  `,
-    [sessionId]
-  );
-
-  response.json(dbResult.rows);
+  try {
+    const dbResult = await db.query(`
+    select    sessions_tracks.session_id,
+              tracks.track_id,
+              tracks.title as track_title,
+              artists.stage_name as artist,
+              sum(
+                case
+                  when sessions_tracks.added_by_system = false then 1
+                  else 0
+                end
+              ) as vote_count,
+              min(sessions_tracks.added_at) as first_added_at
+    from      sessions_tracks
+    join      tracks on sessions_tracks.track_id = tracks.track_id
+    join      artists on tracks.artist_id = artists.artist_id
+    where     sessions_tracks.session_id = $1
+    group by  sessions_tracks.session_id,
+              tracks.track_id,
+              tracks.title,
+              artists.stage_name
+    order by  vote_count desc,
+              first_added_at asc
+    `, [sessionId]
+    );
+    response.json(dbResult.rows);
+  } catch (err) {
+    console.error(err);
+    response.status(500).json("Error in database")
+  }
+  
 }
 
 

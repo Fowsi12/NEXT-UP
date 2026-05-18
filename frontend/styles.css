@@ -9,8 +9,22 @@ body {
   margin: 0;
 }
 .binaryFlowHeader {
+  font-family: "Goldman", sans-serif;
+  font-weight: 700;
+  font-style: normal;
   text-align: center;
+  letter-spacing: 2px;
+  font-size: 50px;
+  color: yellow;
+  text-shadow: 0 2px 2px#000000;
+}
+.subHeader {
+  font-family: "Goldman", sans-serif;
+  font-weight: bold;
+  font-style: normal;
   color: white;
+  font-size: 30px;
+  text-align: center;
 }
 .centerContent {
   display: flex;
@@ -38,6 +52,10 @@ body {
 .centerBtnImg { /* class til sizing til alle img inde i knapper (knapper der kun har et billede) */
   width: 100%;
   height: auto;
+}
+.btnReact {
+  box-shadow: 0 5px 5px black;/* skyggeeffekt: right px bottom px længde px farve */
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 /* ERROR MESSAGES:
 Til fejlbeskeder - vises centreret midt på siden og fader ud efter 5 sekunder
@@ -105,23 +123,124 @@ id="errorBox
     content: "";
   }
 }
+.primaryButtons {
+  z-index: 1;
+  display: flex;
+  justify-content: center; /* centrerer tekst vandret */
+  align-items: center;     /* centrerer tekst lodret */
+  
+  height: 60px;
+  padding-left: 40px;
+  padding-right: 40px;
+  margin-top: 20px;
+  background-color: black;
 
+  color: yellow;
+  font-size: 24px;
+  font-family: "Goldman", sans-serif;
+  text-align: center;
+  border: 2px solid purple;
+  box-shadow: 0 5px 5px black;/* skyggeeffekt: right px bottom px længde px farve */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s; /* transformer box shadow når man trykker på knappen */
+  border-radius: 200px;
+}
+.primaryButtons:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 2px black;
+}
+.primaryButtons:hover {
+  background-color: rgb(46, 46, 46);
+  border-color: #b300ff;
+}
+
+/* JOIN SESSION */
+#joinSessionInput {
+  position: relative;
+  width: 300px; /* lidt bredere end input */
+  margin-top: 80px; 
+}
+#joinSession {
+  width: 300px;
+  height: 50px;
+  padding: 10px 45px 10px 15px; /* ekstra padding til højre så teksten ikke overlapper knappen */
+  border-radius: 50px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+.joinSessionBtn {
+  position: absolute;
+  right: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 45px;
+  height: 45px;
+
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.267);
+  border-radius: 50%;
+}
+.joinBtnImg {
+  width: 30px;
+  height: 30px;
+}
 /* MOOD MENU */
 /*mood knapper layout*/
 .moodMenu { 
   display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 12px;
+  grid-template-columns: repeat(3,1fr);
+  gap: 30px;
 }
+/* OPEN MOOD KNAPPER */
+.openMoodBox {
+  z-index: 1;
+  display: flex;
+  justify-content: center; /* centrerer tekst vandret */
+  align-items: center;     /* centrerer tekst lodret */
+  
+  width: 100%; /* knapperne fylder x af deres celler */
+  height: 100px;
+  padding: 40px;
+  background-color: black;
+
+  color: yellow;
+  font-size: 24px;
+  font-family: "Goldman", sans-serif;
+  font-weight: 550;
+  text-align: center;
+  border: 2px solid purple;
+  box-shadow: 0 5px 5px black;/* skyggeeffekt: right px bottom px længde px farve */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s; /* transformer box shadow når man trykker på knappen */
+  border-radius: 200px;
+}
+.openMoodBox:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 2px black;
+}
+.openMoodBox:hover {
+  background-color: rgb(46, 46, 46);
+  border-color: #b300ff;
+}
+
 /* MOOD POPUP BOXES */
 .moodBox {
   position: fixed; /* overlay position over knapper*/
   z-index: 20;
-  top: 15%; /*jo højere værdi, jo længere væk fra toppen */
+  top: 20%; /*jo højere værdi, jo længere væk fra toppen */
 
   width: 50%; /*størrelse på mood boxes*/
   height: auto; /*tilpasser selv størrelse efter hvor mange rækker med tracks, der genereres af js funktion til boxene */
-  padding: 2.5%; /* afstand fra kanter til indhold i boxen */
+  padding-bottom: 2.5%; /* afstand fra kanter til indhold i boxen */
+  padding-left: 2.5%;
+  padding-right: 2.5%;
 
   opacity: 0; /*0=gennemsigtig, 1=uigennemsigtig,*/
   transition: opacity 0.5s ease;
@@ -132,10 +251,15 @@ id="errorBox
   border: 3px solid #b300ff;
   border-radius: 16px;
 }
+
 /* OVERSKRIFTER I MOOD POPUP BOXES */
 .moodHeader {
+  font-family: "Goldman", sans-serif;
+  font-weight: bold;
+  font-style: normal;
+  color: yellow;
+  font-size: 30px;
   text-align: center;
-  color: white;
 }
 .moodTrackList {
   color: white;
@@ -313,10 +437,6 @@ id="errorBox
 
 /* MY VOTES SIDEN */
 /* My Votes header */
-.myVotesHeader {
-  color:white;
-  text-align: center;
-}
 .myVotesList {
   color: white; /* text hvid i listen */
   width: 50%;
@@ -383,7 +503,6 @@ id="errorBox
   
   border: none;
   border-radius: 8px;
-
   background-color: rgb(100, 2, 109);
   padding: 0 25px;  
   color: white;
@@ -512,6 +631,10 @@ id="errorBox
   
   transform: translateX(100%); /* Starter udenfor skærmen til højre */
   transition: transform 0.5s ease;
+
+  font-family: "Goldman", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 .trackFlowBox.open {
 transform: translateX(0); /* Når klassen "open" tilføjes, flyttes den ind på skærmen */
